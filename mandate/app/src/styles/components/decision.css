@@ -1,0 +1,185 @@
+.attention-banner {
+  margin-bottom: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--authority-dim);
+  border-radius: var(--radius);
+  background: var(--authority-wash);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.attention-banner b {
+  color: var(--authority);
+  font: 600 var(--text-2xs) var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.attention-banner ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.attention-banner li { color: var(--ink); line-height: 1.55; }
+
+.attention-banner--error {
+  border-color: color-mix(in srgb, var(--denied) 40%, transparent);
+  background: color-mix(in srgb, var(--denied) 7%, transparent);
+}
+
+.attention-banner--error b { color: var(--denied); }
+
+.decisions {
+  border: 1px solid var(--authority-dim);
+  border-radius: var(--radius);
+  background: var(--authority-wash);
+  margin-bottom: var(--space-4);
+  animation: decision-in var(--dur-slow) var(--ease);
+}
+
+@keyframes decision-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
+.decisions-heading {
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--authority-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.decisions-heading h2 {
+  margin: 0;
+  font-size: var(--text-md);
+  font-weight: 600;
+  color: var(--authority);
+}
+
+.decisions-heading span {
+  color: var(--ink-muted);
+  font: 500 var(--text-2xs) var(--font-mono);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.decision-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, .8fr);
+  gap: var(--space-6);
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--line);
+  transition: opacity var(--dur) var(--ease);
+}
+
+.decision-card:last-child { border-bottom: 0; }
+.decision-card.decided { opacity: .62; }
+
+.decision-topline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.decision-topline b {
+  font: 500 var(--text-lg)/1.3 var(--font-mono);
+  letter-spacing: -.01em;
+  font-variant-numeric: tabular-nums;
+}
+
+.decision-topline time {
+  color: var(--ink-muted);
+  font: 400 var(--text-2xs) var(--font-mono);
+  white-space: nowrap;
+}
+
+.decision-warning {
+  margin: var(--space-3) 0 0;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.decision-rationale {
+  margin: var(--space-3) 0 0;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  max-width: 70ch;
+}
+
+.decision-meta {
+  margin-top: var(--space-3);
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.decision-meta span {
+  color: var(--ink-muted);
+  font: 400 var(--text-2xs) var(--font-mono);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.decision-error {
+  margin: var(--space-2) 0 0;
+  color: var(--denied);
+  font-size: var(--text-xs);
+}
+
+.decision-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+  position: sticky;
+  top: var(--space-5);
+  align-self: start;
+}
+
+.decision-actions > * { min-width: 0; max-width: 100%; }
+.decision-actions :where(div, span) { flex-wrap: wrap; }
+
+@media (max-width: 720px) {
+  .decision-card { grid-template-columns: 1fr; gap: var(--space-4); }
+  .decision-topline { flex-direction: column; align-items: flex-start; gap: 6px; }
+  .decision-topline b { font-size: var(--text-md); }
+}
+
+.standing-by {
+  margin-bottom: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface);
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-4);
+}
+
+.standing-by b {
+  flex: 0 0 auto;
+  color: var(--ink-muted);
+  font: 600 var(--text-2xs) var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.standing-by p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  max-width: 74ch;
+}

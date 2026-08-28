@@ -12,3 +12,12 @@ dist/
 *.tsbuildinfo
 .DS_Store
 *_think.md
+
+# local design scratch
+.scratch/
+.playwright-mcp/
+.impeccable/
+
+# design screenshots never enter the repo
+*.png
+!mandate/app/public/*.png

@@ -174,8 +174,36 @@ mandate-dashboard
 PORT=8790 FRONTEND_DIR=/absolute/path/to/harness/mandate/app/dist npx @truefoundry/trueforge@0.1.4
 ```
 
-Open only `http://localhost:8790` and switch between **Overview** and **Agent workspace**. Port `8030` is
-the local, read-only companion API consumed by Overview; it is not a second UI.
+Open only `http://localhost:8790` and switch between **Dashboard**, **News**, **Diagnostics** and
+**Agent chat**. Port `8030` is the local, read-only companion API consumed by the console; it is not a
+second UI.
+
+#### Working on the console without a broker
+
+The operator console can be developed and reviewed without Alpaca credentials, the guard, or TrueForge.
+A local mock serves the same `/api/snapshot` contract with representative data — pending approvals, a
+multi-day decision journal, positions, news and the strategy scorecard:
+
+```bash
+cd mandate/app
+npm install
+npm run mock      # mock dashboard API on 127.0.0.1:8030
+npm run dev       # Vite dev server on 127.0.0.1:8031
+```
+
+The mock also reproduces the degraded path, which is otherwise hard to observe on demand:
+
+```bash
+curl "http://127.0.0.1:8030/api/mock/degraded?on=true"    # guard unreachable
+curl "http://127.0.0.1:8030/api/mock/degraded?on=false"   # back to live
+```
+
+In degraded mode every broker-derived value renders as an explicit dash labelled `withheld` rather than
+its last known figure, the reason is named, and approvals are hidden: an order cannot be authorized
+against limits nobody can currently check.
+
+The console never holds broker credentials. It reads live state through the guard's read-only MCP tools
+and posts approval decisions back through the companion API.
 
 ### 24/7 autonomy and chat control plane
 
