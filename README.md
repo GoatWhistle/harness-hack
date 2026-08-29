@@ -298,9 +298,8 @@ Qodo Code Review was installed for `GoatWhistle/harness-hack` before product cod
 milestone is developed on a branch, reviewed in a pull request and merged by a human. High-severity
 findings must be fixed or explicitly rejected with a written reason.
 
-The running evidence table and project-specific review rules live in
-[`docs/QODO_REVIEW_LOG.md`](docs/QODO_REVIEW_LOG.md). PRs use the repository template to require test,
-paper-endpoint and secret checks.
+Every pull request is checked for passing tests, paper-only endpoints and the absence of secrets
+before it is merged.
 
 ## Verified integration
 
