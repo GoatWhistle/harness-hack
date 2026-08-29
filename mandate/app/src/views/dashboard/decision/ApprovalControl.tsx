@@ -1,3 +1,4 @@
+import { Icon } from "../../../components/Icon";
 import type { ApprovalAction } from "./DecisionCard";
 
 interface ApprovalControlProps {
@@ -11,7 +12,7 @@ export function ApprovalControl({ action, live, isOrder, onRespond }: ApprovalCo
   if (action?.outcome) {
     return (
       <p className={`approval-outcome approval-outcome--${action.outcome}`}>
-        <span aria-hidden="true">{action.outcome === "approved" ? "✓" : "✕"}</span>
+        <Icon name={action.outcome === "approved" ? "check" : "close"} />
         {action.outcome === "approved" ? "Approved by you" : "Denied by you"}
       </p>
     );
@@ -20,7 +21,7 @@ export function ApprovalControl({ action, live, isOrder, onRespond }: ApprovalCo
   if (!live) {
     return (
       <p className="approval-blocked">
-        <span aria-hidden="true">⊘</span>
+        <Icon name="blocked" />
         Cannot be authorized while the guard is unreachable. The order stays queued.
       </p>
     );
@@ -34,7 +35,7 @@ export function ApprovalControl({ action, live, isOrder, onRespond }: ApprovalCo
         onClick={() => onRespond(true)}
         disabled={action?.busy}
       >
-        <span className="approval-button-mark" aria-hidden="true">✓</span>
+        <span className="approval-button-mark" aria-hidden="true"><Icon name="check" /></span>
         <span className="approval-button-text">
           <b>Approve</b>
           <small>{isOrder ? "Submits the paper order" : "Lets the agent proceed"}</small>
@@ -47,7 +48,7 @@ export function ApprovalControl({ action, live, isOrder, onRespond }: ApprovalCo
         onClick={() => onRespond(false)}
         disabled={action?.busy}
       >
-        <span className="approval-button-mark" aria-hidden="true">✕</span>
+        <span className="approval-button-mark" aria-hidden="true"><Icon name="close" /></span>
         <span className="approval-button-text">
           <b>Deny</b>
           <small>{isOrder ? "Agent replans" : "Agent stands down"}</small>

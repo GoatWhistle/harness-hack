@@ -13,14 +13,29 @@
   height: 9px;
   margin: 4px auto 0;
   border-radius: 50%;
-  background: var(--surface-raised);
 }
 
 .skeleton-line {
   display: block;
   height: 9px;
   border-radius: 2px;
-  background: var(--surface-raised);
+}
+
+.skeleton-line,
+.skeleton-marker {
+  background: linear-gradient(
+    90deg,
+    var(--surface-raised) 0%,
+    #23232a 50%,
+    var(--surface-raised) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-sweep 1400ms ease-in-out infinite;
+}
+
+@keyframes skeleton-sweep {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }
 
 .skeleton-line--title { width: 32%; height: 12px; }

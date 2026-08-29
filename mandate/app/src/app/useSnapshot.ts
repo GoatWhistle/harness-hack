@@ -7,23 +7,26 @@ export interface SnapshotState {
   snapshot: Snapshot | null;
   error: string | null;
   refreshing: boolean;
+  manualRefresh: boolean;
   paused: boolean;
   hidden: boolean;
   nowMs: number;
   setPaused: (update: (value: boolean) => boolean) => void;
-  refresh: () => Promise<void>;
+  refresh: (manual?: boolean) => Promise<void>;
 }
 
 export function useSnapshot(): SnapshotState {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [manualRefresh, setManualRefresh] = useState(false);
   const [paused, setPaused] = useState(false);
   const [hidden, setHidden] = useState(() => document.visibilityState === "hidden");
   const [nowMs, setNowMs] = useState(() => Date.now());
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (manual = false) => {
     setRefreshing(true);
+    if (manual) setManualRefresh(true);
     try {
       setSnapshot(await getSnapshot());
       setError(null);
@@ -31,6 +34,7 @@ export function useSnapshot(): SnapshotState {
       setError(reason instanceof Error ? reason.message : "Dashboard data is unavailable");
     } finally {
       setRefreshing(false);
+      setManualRefresh(false);
     }
   }, []);
 
@@ -55,15 +59,7 @@ export function useSnapshot(): SnapshotState {
     return () => window.clearInterval(timer);
   }, []);
 
-  return { snapshot, error, refreshing, paused, hidden, nowMs, setPaused, refresh };
-}
-
-export function useDocumentTitle(pendingCount: number): void {
-  useEffect(() => {
-    document.title = pendingCount > 0
-      ? `(${pendingCount}) MANDATE · Operator Console`
-      : "MANDATE · Operator Console";
-  }, [pendingCount]);
+  return { snapshot, error, refreshing, manualRefresh, paused, hidden, nowMs, setPaused, refresh };
 }
 
 const STALE_AFTER_S = 20;

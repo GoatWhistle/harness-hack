@@ -1,4 +1,4 @@
-export type IconName = "refresh" | "external" | "pulse" | "settings" | "close";
+export type IconName = "refresh" | "external" | "pulse" | "settings" | "close" | "check" | "blocked";
 
 const paths: Record<IconName, React.ReactNode> = {
   refresh: <path d="M20 12a8 8 0 1 1-2.3-5.7L20 8M20 4v4h-4" />,
@@ -11,6 +11,13 @@ const paths: Record<IconName, React.ReactNode> = {
     </>
   ),
   close: <path d="m6 6 12 12M18 6 6 18" />,
+  check: <path d="m5 13 4.5 4.5L19 7" />,
+  blocked: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="m6 18 12-12" />
+    </>
+  ),
 };
 
 export function Icon({ name }: { name: IconName }) {

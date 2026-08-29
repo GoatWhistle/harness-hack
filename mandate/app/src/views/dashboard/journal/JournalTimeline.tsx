@@ -1,6 +1,6 @@
 import { Empty } from "../../../components/Panel";
 import { SkeletonTimeline } from "../../../components/Skeleton";
-import { timestamp } from "../../../lib/format";
+import { isoDate, timestamp } from "../../../lib/format";
 import { emptyMessage, outcomeLabel, type TimelineFilter } from "../../../lib/outcomes";
 import type { Journal } from "../../../lib/api";
 import { BreachTable } from "./BreachTable";
@@ -21,7 +21,25 @@ function entryTitle(entry: Journal): string {
   return entry.action.replaceAll("_", " ").toUpperCase();
 }
 
-function TimelineItem({ entry, last }: { entry: Journal; last: boolean }) {
+function entryKey(entry: Journal): string {
+  const orderId = entry.details.order_id;
+  if (typeof orderId === "string" && orderId) return `order:${orderId}`;
+  const intentId = entry.details.intent_id;
+  if (typeof intentId === "string" && intentId) return `intent:${intentId}:${entry.outcome}`;
+  const intended = entry.details.intended_action;
+  if (typeof intended === "string" && intended) return `intended:${intended}:${entry.outcome}`;
+  return `${entry.action}:${entry.outcome}:${entry.rationale.slice(0, 40)}`;
+}
+
+function TimelineItem({
+  entry,
+  index,
+  last,
+}: {
+  entry: Journal;
+  index: number;
+  last: boolean;
+}) {
   const title = entryTitle(entry);
   const chips = [
     entry.details.intent_id
@@ -31,7 +49,10 @@ function TimelineItem({ entry, last }: { entry: Journal; last: boolean }) {
   ].filter(Boolean) as string[];
 
   return (
-    <article className={`timeline-item outcome--${entry.outcome}`}>
+    <article
+      className={`timeline-item outcome--${entry.outcome}`}
+      style={{ "--row-index": index } as React.CSSProperties}
+    >
       <div className="timeline-marker">
         <i aria-hidden="true" />
         {!last && <span aria-hidden="true" />}
@@ -42,7 +63,7 @@ function TimelineItem({ entry, last }: { entry: Journal; last: boolean }) {
             <b>{title}</b>
             <em>{outcomeLabel(entry.outcome)}</em>
           </div>
-          <time>{timestamp(entry.at)}</time>
+          <time dateTime={isoDate(entry.at)}>{timestamp(entry.at)}</time>
         </div>
         <p>{entry.rationale}</p>
         <BreachTable details={entry.details} />
@@ -84,8 +105,9 @@ export function JournalTimeline({ entries, filter, loading = false }: JournalTim
           </h3>
           {day.entries.map((entry, index) => (
             <TimelineItem
-              key={`${entry.at}-${index}`}
+              key={entryKey(entry)}
               entry={entry}
+              index={index}
               last={index === day.entries.length - 1}
             />
           ))}

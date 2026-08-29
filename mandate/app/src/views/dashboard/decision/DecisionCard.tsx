@@ -1,4 +1,4 @@
-import { timestamp } from "../../../lib/format";
+import { isoDate, timestamp } from "../../../lib/format";
 import { OrderTerms, decisionSummary, isOrderTool } from "./decisionTerms";
 import { ApprovalControl } from "./ApprovalControl";
 import { MandateAuthority } from "./MandateAuthority";
@@ -15,6 +15,7 @@ interface DecisionCardProps {
   limits: Record<string, unknown>;
   action: ApprovalAction | undefined;
   live: boolean;
+  index: number;
   onRespond: (item: Record<string, unknown>, approve: boolean) => void;
 }
 
@@ -24,6 +25,7 @@ export function DecisionCard({
   limits,
   action,
   live,
+  index,
   onRespond,
 }: DecisionCardProps) {
   const args = (item.arguments && typeof item.arguments === "object"
@@ -32,11 +34,24 @@ export function DecisionCard({
   const toolName = String(item.tool_name ?? "tool");
   const isOrder = isOrderTool(toolName);
   return (
-    <article className={`decision-card${action?.outcome ? " decided" : ""}`}>
+    <article
+      className={`decision-card${action?.outcome ? " decided" : ""}`}
+      style={{ "--card-index": index } as React.CSSProperties}
+    >
+      <div className="decision-actions">
+        <ApprovalControl
+          action={action}
+          live={live}
+          isOrder={isOrder}
+          onRespond={(approve) => onRespond(item, approve)}
+        />
+        {action?.error ? <p className="decision-error" role="alert">{action.error}</p> : null}
+      </div>
+
       <div className="decision-main">
         <div className="decision-topline">
           <b>{decisionSummary(toolName, args)}</b>
-          <time>{timestamp(item.created_at)}</time>
+          <time dateTime={isoDate(item.created_at)}>{timestamp(item.created_at)}</time>
         </div>
 
         {isOrder && (
@@ -64,15 +79,6 @@ export function DecisionCard({
         </details>
       </div>
 
-      <div className="decision-actions">
-        <ApprovalControl
-          action={action}
-          live={live}
-          isOrder={isOrder}
-          onRespond={(approve) => onRespond(item, approve)}
-        />
-        {action?.error ? <p className="decision-error">{action.error}</p> : null}
-      </div>
     </article>
   );
 }

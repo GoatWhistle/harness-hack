@@ -18,13 +18,29 @@
 
 .approval-button-mark {
   flex: 0 0 auto;
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);
-  font-size: var(--text-sm);
-  line-height: 1;
+}
+
+.approval-button-mark svg {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.approval-outcome svg,
+.approval-blocked svg {
+  flex: 0 0 auto;
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .approval-button-text {
@@ -55,7 +71,6 @@
 .approval-button--approve .approval-button-mark {
   background: var(--authority);
   color: var(--ground);
-  font-weight: 700;
 }
 
 .approval-button--approve:hover:not(:disabled) {

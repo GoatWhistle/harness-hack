@@ -41,11 +41,32 @@
   border-radius: var(--radius);
   background: var(--authority-wash);
   margin-bottom: var(--space-4);
-  animation: decision-in var(--dur-slow) var(--ease);
+  position: relative;
 }
 
-@keyframes decision-in {
-  from { opacity: 0; transform: translateY(6px); }
+.decisions::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow: 0 0 48px -12px var(--authority);
+  opacity: .55;
+  animation: authority-breathe 8s ease-in-out infinite;
+}
+
+.decisions[data-awaiting="0"]::before,
+.decisions[data-hidden="true"]::before {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes authority-breathe {
+  50% { opacity: .85; }
+}
+
+@keyframes decision-enter {
+  from { opacity: 0; transform: translateY(8px); }
 }
 
 .decisions-heading {
@@ -77,7 +98,9 @@
   gap: var(--space-6);
   padding: var(--space-5);
   border-bottom: 1px solid var(--line);
-  transition: opacity var(--dur) var(--ease);
+  transition: opacity var(--dur) var(--ease) 120ms;
+  animation: decision-enter var(--dur-enter) var(--ease) both;
+  animation-delay: calc(min(var(--card-index, 0), 3) * 60ms);
 }
 
 .decision-card:last-child { border-bottom: 0; }
@@ -137,7 +160,11 @@
   font-size: var(--text-xs);
 }
 
+.decision-main { grid-column: 1; grid-row: 1; }
+
 .decision-actions {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -153,6 +180,8 @@
 
 @media (max-width: 1100px) {
   .decision-card { grid-template-columns: 1fr; gap: var(--space-4); }
+  .decision-main { grid-column: 1; grid-row: 1; }
+  .decision-actions { grid-column: 1; grid-row: 2; }
   .decision-topline { flex-direction: column; align-items: flex-start; gap: 6px; }
   .decision-topline b { font-size: var(--text-md); }
 }

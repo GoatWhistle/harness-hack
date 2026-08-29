@@ -6,6 +6,7 @@ interface DecisionQueueProps {
   limits: Record<string, unknown>;
   actions: Record<string, ApprovalAction>;
   live: boolean;
+  hidden: boolean;
   onRespond: (item: Record<string, unknown>, approve: boolean) => void;
 }
 
@@ -15,6 +16,7 @@ export function DecisionQueue({
   limits,
   actions,
   live,
+  hidden,
   onRespond,
 }: DecisionQueueProps) {
   if (!items.length) return null;
@@ -24,7 +26,12 @@ export function DecisionQueue({
   ).length;
 
   return (
-    <section className="decisions" aria-label="Decisions awaiting approval">
+    <section
+      className="decisions"
+      aria-label="Decisions awaiting approval"
+      data-awaiting={awaiting}
+      data-hidden={hidden}
+    >
       <div className="decisions-heading">
         <h2>Operator decisions</h2>
         <span>{awaiting} awaiting</span>
@@ -37,11 +44,12 @@ export function DecisionQueue({
           ? ""
           : ", but the guard is unreachable and none can be authorized"}
       </p>
-      {items.map((item) => {
+      {items.map((item, index) => {
         const toolCallId = String(item.tool_call_id ?? "");
         return (
           <DecisionCard
             key={toolCallId || String(item.created_at ?? "")}
+            index={index}
             item={item}
             headroom={headroom}
             limits={limits}

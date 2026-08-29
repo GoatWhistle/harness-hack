@@ -71,3 +71,25 @@
     min-height: 480px;
   }
 }
+
+.workspace-body { view-transition-name: workspace; }
+
+::view-transition-old(workspace) {
+  animation: vt-out 120ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(workspace) {
+  animation: vt-in var(--dur-view) var(--ease) both;
+}
+
+@keyframes vt-out { to { opacity: 0; } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(6px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(workspace),
+  ::view-transition-new(workspace) {
+    animation-name: vt-fade !important;
+    animation-duration: 80ms !important;
+  }
+  @keyframes vt-fade { from { opacity: 0; } }
+}

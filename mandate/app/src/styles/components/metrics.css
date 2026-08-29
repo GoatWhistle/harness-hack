@@ -113,6 +113,12 @@
   border-radius: var(--radius-sm);
   padding: 3px 6px;
   font: 500 var(--text-2xs) var(--font-mono);
+  transition: border-color var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+}
+
+.universe-chips b:hover {
+  border-color: var(--line-strong);
+  color: var(--ink);
 }
 
 @media (max-width: 1050px) {

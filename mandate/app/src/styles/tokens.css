@@ -57,4 +57,9 @@
   --dur: 200ms;
   --dur-fast: 150ms;
   --dur-slow: 240ms;
+  --dur-view: 180ms;
+  --dur-enter: 260ms;
+  --dur-drawer: 320ms;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
 }

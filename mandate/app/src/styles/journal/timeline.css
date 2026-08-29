@@ -4,7 +4,13 @@
   overflow-y: auto;
 }
 
+@keyframes entry-in {
+  from { opacity: 0; transform: translateY(6px); }
+}
+
 .timeline-item {
+  animation: entry-in var(--dur-enter) var(--ease) both;
+  animation-delay: calc(min(var(--row-index, 0), 8) * 35ms);
   display: grid;
   grid-template-columns: 20px 1fr;
   gap: var(--space-3);
@@ -15,6 +21,25 @@
   display: flex;
   justify-content: center;
 }
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -12px;
+  top: 14px;
+  bottom: 10px;
+  width: 1px;
+  background: var(--rail);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.timeline-item { position: relative; --rail: var(--neutral-state); }
+.timeline-item.outcome--submitted { --rail: var(--allowed); }
+.timeline-item.outcome--denied,
+.timeline-item.outcome--conflict { --rail: var(--denied); }
+.timeline-item.outcome--parked { --rail: var(--parked); }
+.timeline-item:hover::before { opacity: .7; }
 
 .timeline-marker i {
   width: 9px;

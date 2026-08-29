@@ -37,6 +37,7 @@ interface TopBarProps {
   hidden: boolean;
   paused: boolean;
   refreshing: boolean;
+  manualRefresh: boolean;
   approvalCount: number;
   executionMode: ExecutionMode;
   executionBusy: boolean;
@@ -58,6 +59,7 @@ export function TopBar({
   hidden,
   paused,
   refreshing,
+  manualRefresh,
   approvalCount,
   executionMode,
   executionBusy,
@@ -126,7 +128,7 @@ export function TopBar({
                 onClick={onRefresh}
                 disabled={refreshing}
               >
-                <span className={refreshing ? "spin" : ""}>
+                <span className={manualRefresh ? "spin" : ""}>
                   <Icon name="refresh" />
                 </span>
               </button>

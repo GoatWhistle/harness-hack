@@ -9,6 +9,26 @@
 
 * { box-sizing: border-box; }
 
+.skip-link {
+  position: absolute;
+  left: var(--space-3);
+  top: var(--space-3);
+  z-index: var(--z-toast);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--authority);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  color: var(--ink);
+  font: 500 var(--text-2xs) var(--font-mono);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--dur) var(--ease);
+}
+
+.skip-link:focus-visible { transform: translateY(0); }
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -138,14 +158,20 @@ pre {
   line-height: 1.6;
 }
 
+@keyframes fade-in-rm { from { opacity: 0; } }
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
+    animation: none !important;
     transition-duration: 80ms !important;
-    transition-property: opacity, color, border-color, background-color !important;
+    transition-property: opacity, color, border-color, background-color, fill, stroke !important;
   }
-  .spin { animation: none; }
+  .decisions::before { animation: none !important; opacity: .7 !important; }
+  .skeleton-line, .skeleton-marker { background: var(--surface-raised) !important; }
+  .decisions, .settings-drawer, .decision-card, .timeline-item {
+    animation: fade-in-rm 80ms linear both !important;
+    animation-delay: 0s !important;
+  }
 }
 
 [data-openui-devtools-root] { display: none !important; }
