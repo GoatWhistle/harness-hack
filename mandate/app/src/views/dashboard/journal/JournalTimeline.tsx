@@ -8,17 +8,26 @@ import { groupByDay } from "./groupByDay";
 
 function entryTitle(entry: Journal): string {
   const order = entry.details.order as Record<string, unknown> | undefined;
-  if (entry.action === "submit_order" && order) {
+  if (order) {
     return `${String(order.side ?? "").toUpperCase()} ${order.qty ?? ""} ${order.symbol ?? ""}`;
   }
-  return entry.action.replaceAll("_", " ");
+  const intended = entry.details.intended_action;
+  if (typeof intended === "string" && intended) {
+    const [side, qty, symbol] = intended.split(" ");
+    return symbol ? `${side.toUpperCase()} ${qty} ${symbol}` : intended.toUpperCase();
+  }
+  const intent = entry.details.intent_id;
+  if (typeof intent === "string" && intent) return `INTENT ${intent.toUpperCase()}`;
+  return entry.action.replaceAll("_", " ").toUpperCase();
 }
 
 function TimelineItem({ entry, last }: { entry: Journal; last: boolean }) {
+  const title = entryTitle(entry);
   const chips = [
-    entry.details.intent_id && `intent ${String(entry.details.intent_id)}`,
+    entry.details.intent_id
+      && !title.startsWith("INTENT ")
+      && `intent ${String(entry.details.intent_id)}`,
     entry.details.order_id && `order ${String(entry.details.order_id).slice(0, 14)}`,
-    entry.details.intended_action && String(entry.details.intended_action),
   ].filter(Boolean) as string[];
 
   return (
@@ -30,7 +39,7 @@ function TimelineItem({ entry, last }: { entry: Journal; last: boolean }) {
       <div className="timeline-content">
         <div className="timeline-topline">
           <div>
-            <b>{entryTitle(entry)}</b>
+            <b>{title}</b>
             <em>{outcomeLabel(entry.outcome)}</em>
           </div>
           <time>{timestamp(entry.at)}</time>

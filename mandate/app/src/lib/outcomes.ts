@@ -27,7 +27,7 @@ export const timelineFilters: {
 }[] = [
   { key: "all", label: "All", outcomes: [] },
   { key: "submitted", label: "Submitted", outcomes: ["submitted", "submitted_reconciled"] },
-  { key: "denied", label: "Denied", outcomes: ["denied", "conflict"] },
+  { key: "denied", label: "Refused", outcomes: ["denied", "conflict"] },
   { key: "parked", label: "Parked", outcomes: ["parked"] },
 ];
 

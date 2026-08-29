@@ -11,6 +11,7 @@ interface MetricProps {
   used?: number;
   limit?: number;
   unit?: string;
+  digits?: number;
 }
 
 export function Metric({
@@ -21,10 +22,11 @@ export function Metric({
   used,
   limit,
   unit = "%",
+  digits,
 }: MetricProps) {
   const hasBar = limit !== undefined && used !== undefined && limit > 0;
   const ratio = hasBar ? Math.min(Math.max((used / limit) * 100, 0), 100) : 0;
-  const barDanger = (hasBar && ratio >= 80) || tone === "bad";
+  const barDanger = hasBar && ratio >= 80;
 
   return (
     <article className={`metric metric--${tone}`}>
@@ -38,7 +40,7 @@ export function Metric({
             aria-valuenow={used}
             aria-valuemin={0}
             aria-valuemax={limit}
-            aria-label={`${label}: ${decimal(used)} of ${decimal(limit)}${unit}`}
+            aria-label={`${label}: ${decimal(used, digits)} of ${decimal(limit, digits)}${unit} used`}
           >
             <i
               className={barDanger ? "danger" : ""}
@@ -46,8 +48,7 @@ export function Metric({
             />
           </div>
           <small>
-            {decimal(used)} / {decimal(limit)}
-            {unit}
+            {decimal(used, digits)}{unit} of {decimal(limit, digits)}{unit} used
           </small>
         </div>
       ) : (

@@ -23,7 +23,9 @@ export function PositionsPanel({ positions, pending, live }: PositionsPanelProps
         </div>
       ) : (
         <Empty>
-          No open positions. The agent holds nothing on the paper account right now.
+          {live
+            ? "No open positions. The agent holds nothing on the paper account right now."
+            : "Positions are withheld. The broker cannot be reached, so this panel cannot say what is held."}
         </Empty>
       )}
 
@@ -45,7 +47,11 @@ export function PositionsPanel({ positions, pending, live }: PositionsPanelProps
           ))}
         </div>
       ) : (
-        <p className="muted">No orders are waiting at the broker.</p>
+        <p className="muted">
+          {live
+            ? "No orders are waiting at the broker."
+            : "Pending orders are withheld while the broker is unreachable."}
+        </p>
       )}
     </Panel>
   );

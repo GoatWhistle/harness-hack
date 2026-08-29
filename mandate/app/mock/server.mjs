@@ -421,7 +421,7 @@ function degradedSnapshot() {
       { name: "trueforge", url: "http://localhost:8790", ok: false },
     ],
     autonomy: autonomyState(),
-    approvals: { count: 0, items: [] },
+    approvals: approvals(),
     errors: ["guard unavailable: ConnectionRefusedError"],
   };
 }

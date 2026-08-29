@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { TopBar } from "./app/TopBar";
 import { WorkspaceTabs, type View } from "./app/WorkspaceTabs";
+import { useDecidedItems } from "./app/useDecidedItems";
 import { freshnessLabel, isStale, useDocumentTitle, useSnapshot } from "./app/useSnapshot";
 import { readExecutionMode } from "./components/ExecutionToggle";
 import { respondToApproval, updateTrajectory } from "./lib/api";
@@ -23,6 +24,7 @@ export function App() {
 
   const news = useMemo(() => newsItems(snapshot), [snapshot]);
   const approvals = snapshot?.approvals ?? { count: 0, items: [] };
+  const decisionItems = useDecidedItems(approvals.items, approvalActions);
   const mandate = (snapshot?.mandate.mandate ?? {}) as Record<string, unknown>;
   const universe = Array.isArray(mandate.universe) ? mandate.universe.map(String) : [];
 
@@ -88,8 +90,8 @@ export function App() {
     <div className="app-shell">
       <TopBar
         marketOpen={snapshot?.mandate.market_is_open ?? false}
-        source={snapshot?.source ?? null}
-        sourceReasons={snapshot?.errors ?? []}
+        source={error ? "degraded" : snapshot?.source ?? null}
+        sourceReasons={error ? [error, ...(snapshot?.errors ?? [])] : snapshot?.errors ?? []}
         stale={isStale(snapshot, state.nowMs)}
         services={snapshot?.services ?? []}
         freshness={freshnessLabel(snapshot, state.nowMs, state.paused)}
@@ -114,6 +116,7 @@ export function App() {
           snapshot={snapshot}
           error={executionError ?? error}
           news={news}
+          decisionItems={decisionItems}
           approvalActions={approvalActions}
           onRespond={(item, approve) => void handleRespond(item, approve)}
           onOpenNews={() => setView("news")}

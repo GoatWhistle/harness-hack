@@ -39,7 +39,7 @@ export function BreachTable({ details }: { details: Record<string, unknown> }) {
           <tr key={`${breach.rule}-${breach.projected}`}>
             <th scope="row">{breach.rule.replaceAll("_", " ")}</th>
             <td>{breach.limit}</td>
-            <td>{breach.projected}</td>
+            <td className="breach-value">{breach.projected}</td>
             <td>{breach.headroom}</td>
           </tr>
         ))}

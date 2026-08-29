@@ -4,13 +4,14 @@ interface Rule {
   key: string;
   label: string;
   unit: string;
+  digits?: number;
 }
 
 const RULES: Rule[] = [
   { key: "max_position_pct", label: "Position", unit: "%" },
   { key: "max_gross_exposure_pct", label: "Gross exposure", unit: "%" },
   { key: "max_daily_loss_pct", label: "Daily loss", unit: "%" },
-  { key: "max_orders_per_day", label: "Orders today", unit: "" },
+  { key: "max_orders_per_day", label: "Orders today", unit: "", digits: 0 },
 ];
 
 interface MandateAuthorityProps {
@@ -44,10 +45,10 @@ export function MandateAuthority({ headroom, limits }: MandateAuthorityProps) {
           {rows.map((row) => (
             <tr key={row.key} className={row.tight ? "tight" : undefined}>
               <th scope="row">{row.label}</th>
-              <td>{decimal(row.used)}{row.unit}</td>
-              <td>{decimal(row.limit)}{row.unit}</td>
+              <td>{decimal(row.used, row.digits)}{row.unit}</td>
+              <td>{decimal(row.limit, row.digits)}{row.unit}</td>
               <td>
-                {decimal(row.left)}{row.unit}
+                {decimal(row.left, row.digits)}{row.unit}
                 {row.tight && <em> tight</em>}
               </td>
             </tr>

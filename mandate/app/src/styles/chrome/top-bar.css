@@ -27,7 +27,10 @@
 .top-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .wordmark {
@@ -95,6 +98,7 @@
 .mandate-chrome .offline { background: var(--denied); }
 
 .service-health.has-offline span {
+  white-space: nowrap;
   color: var(--denied);
   font: 500 var(--text-2xs) var(--font-mono);
   text-transform: uppercase;
@@ -213,13 +217,13 @@
 }
 
 .execution-toggle--approval {
-  color: var(--authority);
-  border-color: var(--authority-dim);
-  background: var(--authority-wash);
+  color: var(--ink-muted);
+  border-color: var(--line-strong);
+  background: var(--surface-inset);
 }
 
 .execution-toggle--approval span { border-radius: 50%; }
-.execution-toggle--approval:hover { border-color: var(--authority); }
+.execution-toggle--approval:hover { border-color: var(--ink-muted); color: var(--ink); }
 
 .execution-toggle--auto {
   color: var(--allowed);

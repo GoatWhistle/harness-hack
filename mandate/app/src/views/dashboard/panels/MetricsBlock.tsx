@@ -55,6 +55,7 @@ export function MetricsBlock({
           used={live ? ordersToday : undefined}
           limit={live ? number(limits.max_orders_per_day) : undefined}
           unit=""
+          digits={0}
         />
       </div>
       <div className="metrics-footer">

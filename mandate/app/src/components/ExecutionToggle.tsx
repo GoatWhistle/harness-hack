@@ -9,7 +9,7 @@ interface ExecutionToggleProps {
 
 export function ExecutionToggle({ mode, busy, disabled, onToggle }: ExecutionToggleProps) {
   const auto = mode === "auto_paper";
-  const label = busy ? "Switching" : auto ? "Auto paper" : "Ask approval";
+  const label = busy ? "Switching" : auto ? "Mode: auto paper" : "Mode: approval";
   return (
     <button
       className={`execution-toggle execution-toggle--${auto ? "auto" : "approval"}`}

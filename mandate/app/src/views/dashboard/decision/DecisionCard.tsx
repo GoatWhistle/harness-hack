@@ -1,6 +1,6 @@
-import { ToolApprovalBar } from "@truefoundry/trueforge-ui";
 import { timestamp } from "../../../lib/format";
 import { OrderTerms, decisionSummary, isOrderTool } from "./decisionTerms";
+import { ApprovalControl } from "./ApprovalControl";
 import { MandateAuthority } from "./MandateAuthority";
 
 export interface ApprovalAction {
@@ -14,6 +14,7 @@ interface DecisionCardProps {
   headroom: Record<string, unknown>;
   limits: Record<string, unknown>;
   action: ApprovalAction | undefined;
+  live: boolean;
   onRespond: (item: Record<string, unknown>, approve: boolean) => void;
 }
 
@@ -22,6 +23,7 @@ export function DecisionCard({
   headroom,
   limits,
   action,
+  live,
   onRespond,
 }: DecisionCardProps) {
   const args = (item.arguments && typeof item.arguments === "object"
@@ -29,13 +31,6 @@ export function DecisionCard({
     : {}) as Record<string, unknown>;
   const toolName = String(item.tool_name ?? "tool");
   const isOrder = isOrderTool(toolName);
-  const status = action?.outcome
-    ? {
-        type: action.outcome,
-        label: action.outcome === "approved" ? "Approved" : "Denied",
-      }
-    : undefined;
-
   return (
     <article className={`decision-card${action?.outcome ? " decided" : ""}`}>
       <div className="decision-main">
@@ -70,13 +65,11 @@ export function DecisionCard({
       </div>
 
       <div className="decision-actions">
-        <ToolApprovalBar
-          toolName={toolName}
-          approveOptions={[{ id: "allow", label: "Approve", variant: "primary" }]}
-          denyOptions={[{ id: "deny", label: "Deny", variant: "destructive" }]}
-          onSelect={(optionId) => onRespond(item, optionId === "allow")}
-          status={status}
-          disabled={action?.busy || Boolean(action?.outcome)}
+        <ApprovalControl
+          action={action}
+          live={live}
+          isOrder={isOrder}
+          onRespond={(approve) => onRespond(item, approve)}
         />
         {action?.error ? <p className="decision-error">{action.error}</p> : null}
       </div>

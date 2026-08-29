@@ -22,6 +22,7 @@ interface DashboardViewProps {
   snapshot: Snapshot | null;
   error: string | null;
   news: Record<string, unknown>[];
+  decisionItems: Record<string, unknown>[];
   approvalActions: Record<string, ApprovalAction>;
   onRespond: (item: Record<string, unknown>, approve: boolean) => void;
   onOpenNews: () => void;
@@ -31,6 +32,7 @@ export function DashboardView({
   snapshot,
   error,
   news,
+  decisionItems,
   approvalActions,
   onRespond,
   onOpenNews,
@@ -46,7 +48,7 @@ export function DashboardView({
   const trajectory = snapshot?.autonomy.trajectory ?? {};
   const approvals = snapshot?.approvals ?? { count: 0, items: [] };
   const marketOpen = snapshot?.mandate.market_is_open ?? false;
-  const live = snapshot?.source === "live";
+  const live = snapshot?.source === "live" && !error;
   const universe = Array.isArray(mandate.universe) ? mandate.universe.map(String) : [];
 
   const journal = useMemo(
@@ -63,7 +65,7 @@ export function DashboardView({
       <main>
         {!live && (
           <DegradedNotice
-            reasons={snapshot?.errors ?? []}
+            reasons={error ? [error, ...(snapshot?.errors ?? [])] : snapshot?.errors ?? []}
             offlineServices={(snapshot?.services ?? [])
               .filter((service) => !service.ok)
               .map((service) => service.name)}
@@ -71,12 +73,13 @@ export function DashboardView({
         )}
         <AttentionBanner lines={lines} />
 
-        {approvals.count > 0 && live ? (
+        {decisionItems.length > 0 ? (
           <DecisionQueue
-            items={approvals.items}
+            items={decisionItems}
             headroom={headroom}
             limits={limits}
             actions={approvalActions}
+            live={live}
             onRespond={onRespond}
           />
         ) : live ? (
