@@ -107,3 +107,38 @@
   border-top: 1px solid var(--line);
   color: var(--ink-muted);
 }
+
+.surface-failure {
+  margin: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--denied);
+  border-radius: var(--radius);
+  background: #150e0f;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.surface-failure b {
+  color: var(--denied);
+  font: 600 var(--text-2xs) var(--font-mono);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+
+.surface-failure p {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+
+.surface-failure code {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--surface-inset);
+  color: var(--ink-muted);
+  font: 400 var(--text-2xs) var(--font-mono);
+}

@@ -1,4 +1,4 @@
-import { money } from "../../../lib/format";
+import { hasValue, money } from "../../../lib/format";
 
 const ORDER_TOOLS = new Set(["submit_order_under_mandate"]);
 
@@ -21,10 +21,8 @@ export function decisionSummary(
 }
 
 function notional(args: Record<string, unknown>): string {
-  const qty = Number(args.qty);
-  const price = Number(args.limit_price);
-  if (!Number.isFinite(qty) || !Number.isFinite(price)) return "—";
-  return money(qty * price);
+  if (!hasValue(args.qty) || !hasValue(args.limit_price)) return "—";
+  return money(Number(args.qty) * Number(args.limit_price));
 }
 
 export function OrderTerms({ args }: { args: Record<string, unknown> }) {

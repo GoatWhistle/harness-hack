@@ -1,5 +1,5 @@
 import { Empty, Panel } from "../../../components/Panel";
-import { money } from "../../../lib/format";
+import { hasValue, money } from "../../../lib/format";
 
 interface PositionsPanelProps {
   positions: [string, Record<string, unknown>][];
@@ -16,8 +16,8 @@ export function PositionsPanel({ positions, pending, live }: PositionsPanelProps
             <div key={symbol}>
               <b>{symbol}</b>
               <span>{String(item.qty ?? "0")} shares</span>
-              <strong>{live ? money(item.market_value) : "—"}</strong>
-              <small>@ {live ? money(item.market_price) : "—"}</small>
+              <strong>{live && hasValue(item.market_value) ? money(item.market_value) : "—"}</strong>
+              <small>@ {live && hasValue(item.market_price) ? money(item.market_price) : "—"}</small>
             </div>
           ))}
         </div>
@@ -42,7 +42,7 @@ export function PositionsPanel({ positions, pending, live }: PositionsPanelProps
               <span>
                 {String(order.side ?? "")} {String(order.remaining_qty ?? "")}
               </span>
-              <small>@ {live ? money(order.reference_price) : "—"}</small>
+              <small>@ {live && hasValue(order.reference_price) ? money(order.reference_price) : "—"}</small>
             </div>
           ))}
         </div>

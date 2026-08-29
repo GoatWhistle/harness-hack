@@ -27,7 +27,16 @@ const SessionStateSchema = z.object({
   positions: z.record(z.string(), UnknownRecord).optional().default({}),
   orders_today: z.number().optional().default(0),
   pending_orders: z.array(UnknownRecord).optional().default([]),
-  journal: z.array(JournalEntrySchema).optional().default([]),
+  journal: z
+    .array(z.unknown())
+    .optional()
+    .default([])
+    .transform((entries) =>
+      entries
+        .map((entry) => JournalEntrySchema.safeParse(entry))
+        .filter((result) => result.success)
+        .map((result) => result.data),
+    ),
 });
 
 const AutonomySchema = z

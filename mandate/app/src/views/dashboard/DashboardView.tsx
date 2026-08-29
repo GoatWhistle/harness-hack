@@ -23,6 +23,7 @@ interface DashboardViewProps {
   error: string | null;
   news: Record<string, unknown>[];
   decisionItems: Record<string, unknown>[];
+  hidden: boolean;
   approvalActions: Record<string, ApprovalAction>;
   onRespond: (item: Record<string, unknown>, approve: boolean) => void;
   onOpenNews: () => void;
@@ -33,6 +34,7 @@ export function DashboardView({
   error,
   news,
   decisionItems,
+  hidden,
   approvalActions,
   onRespond,
   onOpenNews,
@@ -62,7 +64,8 @@ export function DashboardView({
 
   return (
     <div className="mandate-chrome operator-view">
-      <main>
+      <main id="main-content" tabIndex={-1}>
+        <h1 className="sr-only">Operator dashboard</h1>
         {!live && (
           <DegradedNotice
             reasons={error ? [error, ...(snapshot?.errors ?? [])] : snapshot?.errors ?? []}
@@ -80,6 +83,7 @@ export function DashboardView({
             limits={limits}
             actions={approvalActions}
             live={live}
+            hidden={hidden}
             onRespond={onRespond}
           />
         ) : live ? (

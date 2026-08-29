@@ -1,6 +1,12 @@
-export function number(value: unknown, digits = 2): number {
+export function number(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+export function hasValue(value: unknown): boolean {
+  if (value === null || value === undefined || value === "") return false;
+  const parsed = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(parsed);
 }
 
 export function money(value: unknown): string {
@@ -21,6 +27,12 @@ export function decimal(value: unknown, digits = 2): string {
 
 export function percent(value: unknown): string {
   return `${decimal(value)}%`;
+}
+
+export function isoDate(value: unknown): string | undefined {
+  if (typeof value !== "string" || !value) return undefined;
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed.toISOString();
 }
 
 export function timestamp(value: unknown): string {

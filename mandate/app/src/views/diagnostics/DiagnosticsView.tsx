@@ -17,7 +17,8 @@ export function DiagnosticsView({ snapshot }: { snapshot: Snapshot | null }) {
 
   return (
     <div className="mandate-chrome diagnostics-view">
-      <main>
+      <main id="main-content" tabIndex={-1}>
+        <h1 className="sr-only">Diagnostics</h1>
         <section className="dashboard-grid">
           <ServicesPanel services={snapshot?.services ?? []} />
           <FeedsPanel

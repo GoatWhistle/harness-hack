@@ -1,6 +1,6 @@
 import { Metric } from "../../../components/Metric";
 import { Withheld } from "../../../components/SourceBadge";
-import { money, number, percent } from "../../../lib/format";
+import { hasValue, money, number, percent } from "../../../lib/format";
 
 interface MetricsBlockProps {
   account: Record<string, unknown>;
@@ -29,12 +29,12 @@ export function MetricsBlock({
       <div className="metrics-grid">
         <Metric
           label="Account equity"
-          value={live ? money(account.equity) : <Withheld />}
+          value={live && hasValue(account.equity) ? money(account.equity) : <Withheld />}
           hint={live ? "Alpaca paper account" : "Needs the guard"}
         />
         <Metric
           label="Daily P&L"
-          value={live ? money(dailyPnl) : <Withheld />}
+          value={live && hasValue(dailyPnl) ? money(dailyPnl) : <Withheld />}
           tone={live && dailyPnl !== 0 ? (dailyPnl > 0 ? "good" : "bad") : "default"}
           hint={live ? undefined : "Needs the guard"}
           used={live ? number(usage.daily_loss_pct) : undefined}

@@ -35,7 +35,12 @@ export async function getSnapshot(signal?: AbortSignal): Promise<Snapshot> {
   if (!response.ok) {
     throw new Error(`Dashboard API returned ${response.status}`);
   }
-  return SnapshotSchema.parse(await response.json());
+  const parsed = SnapshotSchema.safeParse(await response.json());
+  if (!parsed.success) {
+    console.error("Snapshot failed validation", parsed.error.issues);
+    throw new Error("The dashboard API returned a snapshot this console cannot read");
+  }
+  return parsed.data;
 }
 
 export async function updateTrajectory(

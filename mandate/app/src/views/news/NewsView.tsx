@@ -4,7 +4,7 @@ import { NewsCard } from "./NewsCard";
 export function NewsView({ items }: { items: Record<string, unknown>[] }) {
   return (
     <div className="mandate-chrome news-view">
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="news-page-heading">
           <div>
             <span className="kicker">Market intelligence</span>
