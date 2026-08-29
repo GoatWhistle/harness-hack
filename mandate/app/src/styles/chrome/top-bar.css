@@ -155,7 +155,25 @@
   padding: 0 var(--space-5);
   display: flex;
   gap: 22px;
+  position: relative;
 }
+
+.tab-rail {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100px;
+  height: 2px;
+  background: var(--ink);
+  transform-origin: left center;
+  transition: transform 260ms var(--ease-spring);
+  pointer-events: none;
+  view-transition-name: tab-rail;
+}
+
+::view-transition-group(tab-rail) { animation-duration: 260ms; }
+::view-transition-old(tab-rail),
+::view-transition-new(tab-rail) { animation: none; opacity: 1; }
 
 .workspace-tabs button {
   height: 40px;
@@ -173,7 +191,7 @@
 }
 
 .workspace-tabs button:hover { color: var(--ink); }
-.workspace-tabs button.active { color: var(--ink); border-bottom-color: var(--ink); }
+.workspace-tabs button.active { color: var(--ink); }
 
 .tab-badge {
   color: var(--ink-muted);

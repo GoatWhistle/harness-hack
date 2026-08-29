@@ -24,9 +24,9 @@ export const MANDATE_CHAT_TOKENS: SemanticTokens = {
   assistantMessageBg: "transparent",
   assistantMessageText: "#fafafa",
 
-  primaryButtonBg: "#d6ab32",
-  primaryButtonHover: "#e2bb52",
-  primaryButtonText: "#08090d",
+  primaryButtonBg: "#27272a",
+  primaryButtonHover: "#3f3f46",
+  primaryButtonText: "#fafafa",
 
   secondaryButtonBg: "#18181b",
   secondaryButtonHover: "#27272a",
@@ -43,7 +43,8 @@ export const MANDATE_CHAT_TOKENS: SemanticTokens = {
   warningBg: "#d6ab32",
   warningText: "#08090d",
 
-  focusRing: "#d6ab32",
+
+  focusRing: "#52525b",
 
   radius: "4px",
   composerRadius: "4px",

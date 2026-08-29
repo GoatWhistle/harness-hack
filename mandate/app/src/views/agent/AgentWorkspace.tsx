@@ -7,11 +7,11 @@ export function AgentWorkspace() {
       <TrueForgeUI
         server={{ type: "trueforge", baseUrl: "/" }}
         layout="sidebar"
-        agentConfig={{ mode: "SingleAgent", name: "mandate-paper-agent" }}
+        agentConfig={{ mode: "SingleAgent", name: "MANDATE" }}
         theme={{
           preset: "trueforge",
           mode: "dark",
-          brand: { name: "MANDATE" },
+          brand: { name: "MANDATE", logo: "/agent-mark.svg" },
           tokens: MANDATE_CHAT_TOKENS,
         }}
       />

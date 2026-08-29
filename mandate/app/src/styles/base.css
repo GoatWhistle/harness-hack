@@ -27,7 +27,11 @@
   transition: transform var(--dur) var(--ease);
 }
 
-.skip-link:focus-visible { transform: translateY(0); }
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--authority);
+  outline-offset: 2px;
+}
 
 .sr-only {
   position: absolute;
@@ -63,10 +67,17 @@ body {
   stroke-linejoin: miter;
 }
 
-:where(.mandate-chrome, .agent-workspace) :focus-visible {
+:where(.mandate-chrome) :focus-visible {
   outline: 2px solid var(--authority);
   outline-offset: 2px;
 }
+
+.agent-workspace :focus-visible {
+  outline: 2px solid var(--line-strong);
+  outline-offset: 1px;
+}
+
+.agent-workspace textarea:focus-visible { outline: none; }
 
 .numeric,
 .metric strong,
@@ -174,6 +185,7 @@ pre {
   .decisions::before { animation: none !important; opacity: .7 !important; }
   .skeleton-line, .skeleton-marker { background: var(--surface-raised) !important; }
   .degraded-notice { animation: none !important; }
+  .tab-rail { transition: none !important; }
   .approval-outcome svg path { stroke-dashoffset: 0 !important; }
   .approval-outcome { animation: fade-in-rm 80ms linear both !important; }
   .decisions, .settings-drawer, .decision-card, .timeline-item {

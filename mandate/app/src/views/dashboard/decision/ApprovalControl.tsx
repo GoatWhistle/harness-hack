@@ -11,7 +11,7 @@ interface ApprovalControlProps {
 export function ApprovalControl({ action, live, isOrder, onRespond }: ApprovalControlProps) {
   if (action?.outcome) {
     return (
-      <p className={`approval-outcome approval-outcome--${action.outcome}`}>
+      <p className={`approval-outcome approval-outcome--${action.outcome}`} role="status">
         <Icon name={action.outcome === "approved" ? "check" : "close"} />
         {action.outcome === "approved" ? "Approved by you" : "Denied by you"}
       </p>

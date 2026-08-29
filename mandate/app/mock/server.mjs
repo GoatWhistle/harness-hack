@@ -496,7 +496,7 @@ async function readBody(request) {
 function send(response, status, payload) {
   const body = JSON.stringify(payload);
   response.writeHead(status, {
-    "Content-Type": "application/json",
+    "Content-Type": "application/json; charset=utf-8",
     "Cache-Control": "no-store",
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, Accept",
