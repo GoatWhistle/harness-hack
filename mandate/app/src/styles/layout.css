@@ -1,4 +1,42 @@
-.app-shell { min-height: 100vh; }
+.app-shell {
+  min-height: 100vh;
+  position: relative;
+  isolation: isolate;
+}
+
+.app-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 80% at 50% 0%,
+    #101119 0%,
+    var(--ground) 58%,
+    #05060a 100%
+  );
+}
+
+.app-shell::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  z-index: var(--z-sticky);
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--authority-dim) 18%,
+    var(--authority) 50%,
+    var(--authority-dim) 82%,
+    transparent 100%
+  );
+  opacity: .55;
+}
 
 .operator-view main,
 .news-view main,

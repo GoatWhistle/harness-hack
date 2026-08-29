@@ -38,7 +38,7 @@
 
 .decisions {
   border: 1px solid var(--authority-dim);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   background: var(--authority-wash);
   margin-bottom: var(--space-4);
   position: relative;
