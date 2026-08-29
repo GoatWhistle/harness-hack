@@ -8,7 +8,7 @@ interface FieldsProps {
 export function CadenceSection({ form, patch }: FieldsProps) {
   return (
     <section className="settings-section">
-      <small>Cadence &amp; mode</small>
+      <h3>Cadence &amp; mode</h3>
       <div className="settings-grid">
         <label>
           Monitoring mode
@@ -60,7 +60,7 @@ export function CadenceSection({ form, patch }: FieldsProps) {
 export function GatesSection({ form, patch }: FieldsProps) {
   return (
     <section className="settings-section">
-      <small>Data quality gates</small>
+      <h3>Data quality gates</h3>
       <div className="settings-grid">
         <label>
           Max spread, bps
@@ -101,7 +101,7 @@ export function GatesSection({ form, patch }: FieldsProps) {
 export function DiscoverySection({ form, patch }: FieldsProps) {
   return (
     <section className="settings-section">
-      <small>Discovery &amp; events</small>
+      <h3>Discovery &amp; events</h3>
       <div className="settings-grid">
         <label>
           Discovery list size

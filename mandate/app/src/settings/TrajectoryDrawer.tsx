@@ -57,7 +57,7 @@ export function TrajectoryDrawer({
           <DiscoverySection form={form} patch={patch} />
 
           <section className="settings-section">
-            <small>Posture &amp; authority</small>
+            <h3>Posture &amp; authority</h3>
             <div className="settings-grid">
               <label>
                 Risk posture
