@@ -18,6 +18,7 @@ dist/
 .playwright-mcp/
 .impeccable/
 
-# design screenshots never enter the repo
+# scratch screenshots never enter the repo; documentation ones do
 *.png
 !mandate/app/public/*.png
+!docs/screens/*.png
