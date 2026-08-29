@@ -6,6 +6,12 @@
   justify-content: flex-end;
   background: color-mix(in srgb, var(--ground) 72%, transparent);
   backdrop-filter: blur(3px);
+  opacity: 1;
+  transition: opacity var(--dur-drawer) var(--ease);
+}
+
+@starting-style {
+  .settings-backdrop { opacity: 0; }
 }
 
 .settings-drawer {
@@ -16,11 +22,12 @@
   border-left: 1px solid var(--line);
   background: var(--surface);
   box-shadow: -24px 0 60px rgba(0, 0, 0, .5);
-  animation: drawer-in var(--dur) var(--ease);
+  transform: translateX(0);
+  transition: transform var(--dur-drawer) var(--ease-spring);
 }
 
-@keyframes drawer-in {
-  from { transform: translateX(24px); opacity: .6; }
+@starting-style {
+  .settings-drawer { transform: translateX(100%); }
 }
 
 .settings-drawer-header {

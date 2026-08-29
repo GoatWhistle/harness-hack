@@ -207,13 +207,15 @@
   letter-spacing: .12em;
   text-transform: uppercase;
   white-space: nowrap;
-  transition: border-color var(--dur) var(--ease);
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
 }
 
 .execution-toggle span {
   width: 6px;
   height: 6px;
   background: currentColor;
+  transition: border-radius var(--dur) var(--ease-spring);
 }
 
 .execution-toggle--approval {

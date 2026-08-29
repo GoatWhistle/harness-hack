@@ -168,6 +168,7 @@ pre {
   }
   .decisions::before { animation: none !important; opacity: .7 !important; }
   .skeleton-line, .skeleton-marker { background: var(--surface-raised) !important; }
+  .degraded-notice { animation: none !important; }
   .decisions, .settings-drawer, .decision-card, .timeline-item {
     animation: fade-in-rm 80ms linear both !important;
     animation-delay: 0s !important;

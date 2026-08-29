@@ -26,7 +26,13 @@ export function TrajectoryDrawer({
   if (!open) return null;
 
   return (
-    <div className="mandate-chrome settings-backdrop" onMouseDown={onClose}>
+    <div
+      className="mandate-chrome settings-backdrop"
+      onMouseDown={(event) => {
+        event.preventDefault();
+        onClose();
+      }}
+    >
       <aside
         ref={drawerRef as React.RefObject<HTMLElement>}
         className="settings-drawer"
