@@ -77,9 +77,9 @@
 }
 
 .outcome--conflict .timeline-marker i {
-  border-radius: 50%;
-  background: transparent;
-  border: 3px double var(--denied);
+  background: var(--surface);
+  border: 1.5px solid var(--denied);
+  box-shadow: 0 0 0 3px var(--surface), inset 0 0 0 1.5px var(--denied);
 }
 
 .outcome--parked .timeline-marker i {

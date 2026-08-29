@@ -43,7 +43,7 @@
 
 .metric--good strong { color: var(--allowed); }
 .metric--bad strong { color: var(--denied); }
-.metric--warn strong { color: var(--authority); }
+.metric--warn strong { color: var(--ink); }
 
 .metric-bar {
   margin-top: auto;

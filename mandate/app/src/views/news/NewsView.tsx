@@ -7,7 +7,6 @@ export function NewsView({ items }: { items: Record<string, unknown>[] }) {
       <main id="main-content" tabIndex={-1}>
         <section className="news-page-heading">
           <div>
-            <span className="kicker">Market intelligence</span>
             <h1>News</h1>
           </div>
           <span>{items.length} unique stories</span>

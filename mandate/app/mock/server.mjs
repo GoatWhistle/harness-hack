@@ -12,7 +12,9 @@ const state = {
   approvalsResolved: new Set(),
   trajectoryVersion: 7,
   executionMode: "approval",
+  analysisIntervalMinutes: 15,
   degraded: process.env.MANDATE_MOCK_DEGRADED === "true",
+  decided: [],
 };
 
 function minutesAgo(minutes) {
@@ -215,6 +217,7 @@ function journal() {
       rationale: "Regular-hours gate passed but SPY sits below its 20-period average; risk-off scaling left no whole-share size.",
       details: { intended_action: "buy 5 ANET limit 141.20" },
     },
+    ...state.decided,
   ];
 }
 
@@ -292,7 +295,7 @@ function autonomyState() {
       execution_mode: state.executionMode,
       symbols: UNIVERSE,
       news_poll_seconds: 60,
-      analysis_interval_minutes: 15,
+      analysis_interval_minutes: state.analysisIntervalMinutes,
       monitoring_mode: "realtime",
       market_data_feed: "iex",
       discovery_enabled: true,
@@ -388,6 +391,39 @@ function approvals() {
   ];
   const open = items.filter((item) => !state.approvalsResolved.has(item.tool_call_id));
   return { count: open.length, items: open };
+}
+
+function applyDecision(item, approve) {
+  const args = item.arguments ?? {};
+  const isOrder = item.tool_name === "submit_order_under_mandate";
+  const entry = {
+    at: new Date().toISOString(),
+    action: isOrder ? "submit_order" : item.tool_name,
+    outcome: approve ? "submitted" : "denied",
+    rationale: approve
+      ? "Authorized by the operator at the console; the guard re-checked every mandate limit before submitting."
+      : "Refused by the operator at the console. The agent must replan within the mandate.",
+    details: { operator_decision: true },
+  };
+  if (isOrder) {
+    entry.details.order = {
+      symbol: args.symbol,
+      side: args.side,
+      qty: String(args.qty ?? ""),
+      order_type: args.order_type,
+      limit_price: String(args.limit_price ?? ""),
+      instrument: "equity",
+    };
+    if (args.intent_id) entry.details.intent_id = args.intent_id;
+  } else {
+    entry.details.intended_action = `${item.tool_name} requested by the operator chat`;
+  }
+  state.decided.push(entry);
+  if (approve && item.tool_name === "update_trajectory"
+      && typeof args.analysis_interval_minutes === "number") {
+    state.analysisIntervalMinutes = args.analysis_interval_minutes;
+    state.trajectoryVersion += 1;
+  }
 }
 
 function degradedSnapshot() {
@@ -494,7 +530,10 @@ const server = createServer(async (request, response) => {
     const body = await readBody(request);
     if (!body.confirmed) return send(response, 400, { error: "confirmation is required" });
     if (!body.tool_call_id) return send(response, 400, { error: "tool_call_id is required" });
-    state.approvalsResolved.add(String(body.tool_call_id));
+    const toolCallId = String(body.tool_call_id);
+    const pending = approvals().items.find((item) => item.tool_call_id === toolCallId);
+    state.approvalsResolved.add(toolCallId);
+    if (pending) applyDecision(pending, Boolean(body.approve));
     return send(response, 200, { delivered: true, approved: Boolean(body.approve) });
   }
   return send(response, 404, { error: "not found" });

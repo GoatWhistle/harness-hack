@@ -43,7 +43,6 @@ export function TrajectoryDrawer({
       >
         <header className="settings-drawer-header">
           <div>
-            <span className="kicker">Control plane</span>
             <h2 id="monitoring-settings-title">Monitoring settings</h2>
           </div>
           <button className="icon-button" aria-label="Close monitoring settings" onClick={onClose}>

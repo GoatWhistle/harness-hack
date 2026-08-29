@@ -1,7 +1,7 @@
 .source-badge {
   padding: 5px var(--space-3);
   border: 1px solid;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-sm);
   font: 600 var(--text-2xs)/1 var(--font-mono);
   letter-spacing: .13em;
   white-space: nowrap;

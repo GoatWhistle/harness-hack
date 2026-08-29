@@ -1,42 +1,4 @@
-.app-shell {
-  min-height: 100vh;
-  position: relative;
-  isolation: isolate;
-}
-
-.app-shell::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: radial-gradient(
-    120% 80% at 50% 0%,
-    #101119 0%,
-    var(--ground) 58%,
-    #05060a 100%
-  );
-}
-
-.app-shell::after {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  z-index: var(--z-sticky);
-  pointer-events: none;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--authority-dim) 18%,
-    var(--authority) 50%,
-    var(--authority-dim) 82%,
-    transparent 100%
-  );
-  opacity: .55;
-}
+.app-shell { min-height: 100vh; }
 
 .operator-view main,
 .news-view main,
@@ -63,9 +25,13 @@
 }
 
 .diagnostics-view .dashboard-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   align-content: start;
+}
+
+@media (max-width: 860px) {
+  .diagnostics-view .dashboard-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 .diagnostics-view .diag-panel {
@@ -77,9 +43,7 @@
 
 .diagnostics-view .diag-panel--wide { grid-column: 1 / -1; }
 
-@media (min-width: 1100px) {
-  .diagnostics-view .diag-panel--wide { grid-column: span 2; }
-}
+.diagnostics-view .diag-panel--wide + .diag-panel:last-child { grid-column: 1 / -1; }
 
 .diagnostics-view .main-column,
 .diagnostics-view .side-column { display: contents; }

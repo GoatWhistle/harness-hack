@@ -28,9 +28,6 @@
 .approval-button-mark svg {
   width: 16px;
   height: 16px;
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .approval-outcome svg path {
@@ -56,9 +53,6 @@
   flex: 0 0 auto;
   width: 15px;
   height: 15px;
-  stroke-width: 2.25;
-  stroke-linecap: round;
-  stroke-linejoin: round;
 }
 
 .approval-button-text {

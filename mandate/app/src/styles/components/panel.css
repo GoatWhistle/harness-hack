@@ -3,7 +3,6 @@
   border-radius: var(--radius-lg);
   background: var(--surface);
   overflow: hidden;
-  box-shadow: inset 0 1px 0 #ffffff08;
   transition: border-color var(--dur) var(--ease);
 }
 
@@ -135,8 +134,8 @@
 .runner-status--running i { background: var(--allowed); }
 .runner-status--analyzing { color: var(--ink); }
 .runner-status--analyzing i { background: var(--ink); }
-.runner-status--degraded { color: var(--authority); }
-.runner-status--degraded i { background: var(--authority); }
+.runner-status--degraded { color: var(--denied); }
+.runner-status--degraded i { background: var(--denied); }
 .runner-status--paused { color: var(--ink-muted); }
 
 .runner-line {
