@@ -135,3 +135,5 @@ pre {
   }
   .spin { animation: none; }
 }
+
+[data-openui-devtools-root] { display: none !important; }
