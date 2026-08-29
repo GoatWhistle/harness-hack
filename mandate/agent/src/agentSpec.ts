@@ -2,9 +2,17 @@ import type { TrueForgeApi } from "@truefoundry/trueforge-sdk";
 
 import { ALPACA_RESEARCH_TOOLS, ALPACA_WRITE_TOOLS } from "./alpacaTools.js";
 
+export function parseOptionalBoolean(value: string | undefined, name: string): boolean {
+  if (value === undefined || value === "") return false;
+  if (value === "true") return true;
+  if (value === "false") return false;
+  throw new Error(`${name} must be true or false`);
+}
+
 export function buildAgentSpec(
   instructions: string,
   enableResearchSkill = false,
+  requireSubmitApproval = true,
 ): TrueForgeApi.AgentSpec {
   return {
     model: { name: "zai/glm-5-3-flash" },
@@ -17,7 +25,7 @@ export function buildAgentSpec(
         disableTools: [],
         preload: true,
         requireApprovalForTools: [
-          "submit_order_under_mandate",
+          ...(requireSubmitApproval ? ["submit_order_under_mandate"] : []),
           "cancel_order",
           "close_position",
           "update_trajectory",

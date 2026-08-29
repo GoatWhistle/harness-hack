@@ -1,3 +1,4 @@
+import { ExecutionToggle, type ExecutionMode } from "../components/ExecutionToggle";
 import { Icon } from "../components/Icon";
 import { SourceBadge } from "../components/SourceBadge";
 import { Wordmark } from "../components/Wordmark";
@@ -37,11 +38,14 @@ interface TopBarProps {
   paused: boolean;
   refreshing: boolean;
   approvalCount: number;
+  executionMode: ExecutionMode;
+  executionBusy: boolean;
   showRefreshControls: boolean;
   onOpenSettings: () => void;
   onTogglePause: () => void;
   onRefresh: () => void;
   onFocusApprovals: () => void;
+  onToggleExecution: () => void;
 }
 
 export function TopBar({
@@ -55,11 +59,14 @@ export function TopBar({
   paused,
   refreshing,
   approvalCount,
+  executionMode,
+  executionBusy,
   showRefreshControls,
   onOpenSettings,
   onTogglePause,
   onRefresh,
   onFocusApprovals,
+  onToggleExecution,
 }: TopBarProps) {
   return (
     <div className="mandate-chrome topbar-shell">
@@ -74,6 +81,12 @@ export function TopBar({
           {services.length > 0 && <ServiceHealth services={services} />}
         </div>
         <div className="top-actions">
+          <ExecutionToggle
+            mode={executionMode}
+            busy={executionBusy}
+            disabled={source === null}
+            onToggle={onToggleExecution}
+          />
           <span
             className={`freshness${paused || hidden || stale ? " stale" : ""}`}
             title={hidden ? "Auto-refresh paused while the tab is hidden" : undefined}

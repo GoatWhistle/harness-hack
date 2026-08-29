@@ -11,6 +11,7 @@ const UNIVERSE = [
 const state = {
   approvalsResolved: new Set(),
   trajectoryVersion: 7,
+  executionMode: "approval",
   degraded: process.env.MANDATE_MOCK_DEGRADED === "true",
 };
 
@@ -288,6 +289,7 @@ function autonomyState() {
     trajectory: {
       version: state.trajectoryVersion,
       enabled: true,
+      execution_mode: state.executionMode,
       symbols: UNIVERSE,
       news_poll_seconds: 60,
       analysis_interval_minutes: 15,
@@ -478,8 +480,15 @@ const server = createServer(async (request, response) => {
   if (url.pathname === "/api/trajectory" && request.method === "POST") {
     const body = await readBody(request);
     if (!body.confirmed) return send(response, 400, { error: "confirmation is required" });
+    if (body.execution_mode === "approval" || body.execution_mode === "auto_paper") {
+      state.executionMode = body.execution_mode;
+    }
     state.trajectoryVersion += 1;
-    return send(response, 200, { trajectory: { ...autonomyState().trajectory }, mandate_unchanged: true });
+    return send(response, 200, {
+      trajectory: { ...autonomyState().trajectory },
+      mandate_unchanged: true,
+      execution_policy: state.executionMode,
+    });
   }
   if (url.pathname === "/api/approvals/respond" && request.method === "POST") {
     const body = await readBody(request);

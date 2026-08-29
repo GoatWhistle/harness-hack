@@ -62,7 +62,7 @@ news strategy uses only revisions available at each historical cutoff within a b
 issuer feed is never rebound to another ticker: AAPL can use Apple Newsroom and NVDA can use NVIDIA IR,
 while other symbols receive neither feed unless an attributable source is added explicitly.
 
-The unprivileged `mandate-research` package is also a loadable TrueForge Skill. Its
+The unprivileged `mandate-research` package is also available as an opt-in TrueForge Git Skill. Its
 `evaluate_trajectory` tool replaces repeated agent-authored arithmetic with one Decimal-based decision
 matrix. It monitors the full mandate, ranks a production funnel of three equities plus SPY, and computes liquidity and
 stale-data gates, session movement, feature snapshots, ATR14 sizing capped by live mandate headroom and
@@ -212,7 +212,12 @@ keeps REST polling as a configurable fallback, and deduplicates events through a
 a read-only TrueForge analysis immediately for new headlines or on the configured cadence. Each cycle is
 visible in Chat History and must finish with `ACTION: PARK` or `ACTION: PROPOSE`.
 Background turns are mechanically audited after completion and fail if they request an execution,
-trajectory-write or approval tool. `PROPOSE` is a notification for the human, never permission to trade.
+trajectory-write or disallowed destructive tool. They may run read-only sandbox code at any point to
+validate data, test hypotheses, reproduce parser behavior, or run bounded experiments; proposal math
+still comes from the deterministic research and guard tools. The header execution switch selects either
+`ASK APPROVAL`, where a validated submission pauses in TrueForge, or `AUTO PAPER`, where a dedicated agent
+may submit without pausing. Both modes remain paper-only and use the same mandate guard; cancel, close and
+trajectory changes always require approval.
 
 Start it after TrueForge, guard and research MCP are healthy:
 
@@ -223,10 +228,12 @@ npm run autonomy
 
 The shared trajectory defaults to 18 liquid AI-platform/infrastructure equities plus SPY: direct public
 companies and listed proxies for private labs such as Anthropic and DeepSeek. It uses realtime streams, a
-60-second REST fallback and a 15-minute full analysis. Every market poll adds Alpaca snapshots, spread/staleness/volume gates, SPY
-confirmation, observation-only movers/most-actives discovery and corporate-action risks. Optional option
+60-second REST fallback and a 15-minute full analysis. Every market poll adds Alpaca snapshots, spread/staleness/time-adjusted
+intraday volume-pace gates, SPY macro-move context, observation-only movers/most-actives discovery and corporate-action risks. Optional option
 chain confirmation is disabled by default. Discovery never expands the mandate universe. A deterministic
-post-model gate converts `PROPOSE` to `PARK` when regular-hours, liquidity or SPY checks fail.
+post-model gate converts `PROPOSE` to `PARK` when regular-hours, liquidity or SPY checks fail. A strong SPY
+session, gap, or intraday move can produce a macro-price candidate without company news, but only when the
+ensemble and at least two independent price strategies agree with the macro direction.
 The three strongest movers are exposed as an observation-only research watchlist. SPY's 20-bar regime
 changes ensemble weights and halves gross sizing below its 20-period moving average. Strategy multipliers
 learn from completed 60-minute counterfactual outcomes for both PARK and PROPOSE cycles, are evidence-shrunk
@@ -277,8 +284,10 @@ embedded credentials. `MANDATE_RESEARCH_URL` independently configures the read-o
 The registered `mandate-paper-agent` uses `zai/glm-5-3-flash`, sandbox execution, dynamic subagents,
 generative UI, context compaction and three MCP servers. Alpaca exposes only
 calendar, clock and stock-data research tools to the model; all execution flows through `mandate-guard`.
-The `mandate-research` Git Skill is enabled by default and can be disabled with
-`MANDATE_ENABLE_RESEARCH_SKILL=false`. The read-only research MCP remains enabled independently of the Git Skill.
+The `mandate-research` Git Skill is disabled by default so sandbox startup never depends on cloning a
+private GitHub repository. Enable it explicitly with `MANDATE_ENABLE_RESEARCH_SKILL=true` only when
+TrueForge has repository credentials. The read-only research MCP remains enabled independently and
+provides the same decision tools without a Git clone.
 
 The example mandate is [`mandate/mandates/example.yaml`](mandate/mandates/example.yaml). An expired or
 invalid mandate prevents startup and blocks subsequent policy operations if introduced while running.
