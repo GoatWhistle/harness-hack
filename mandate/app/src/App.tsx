@@ -1,4 +1,4 @@
-import { Suspense, lazy, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { flushSync } from "react-dom";
 import { TopBar } from "./app/TopBar";
 import { WorkspaceTabs, type View } from "./app/WorkspaceTabs";
@@ -14,10 +14,7 @@ import type { ApprovalAction } from "./views/dashboard/decision/DecisionCard";
 import { newsItems } from "./views/dashboard/selectors";
 import { DiagnosticsView } from "./views/diagnostics/DiagnosticsView";
 import { NewsView } from "./views/news/NewsView";
-
-const AgentWorkspace = lazy(() =>
-  import("./views/agent/AgentWorkspace").then((module) => ({ default: module.AgentWorkspace })),
-);
+import { AgentWorkspace } from "./views/agent/AgentWorkspace";
 
 const VIEW_AREAS: Record<View, string> = {
   overview: "The dashboard",
@@ -158,11 +155,7 @@ export function App() {
           )}
           {view === "news" && <NewsView items={news} />}
           {view === "diagnostics" && <DiagnosticsView snapshot={snapshot} />}
-          {view === "agent" && (
-            <Suspense fallback={<p className="muted">Loading the agent workspace…</p>}>
-              <AgentWorkspace />
-            </Suspense>
-          )}
+          {view === "agent" && <AgentWorkspace />}
         </ErrorBoundary>
       </div>
 

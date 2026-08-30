@@ -7,7 +7,7 @@ export function AgentWorkspace() {
       <TrueForgeUI
         server={{ type: "trueforge", baseUrl: "/" }}
         layout="sidebar"
-        agentConfig={{ mode: "SingleAgent", name: "MANDATE" }}
+        agentConfig={{ mode: "SingleAgent", name: "mandate-paper-agent" }}
         theme={{
           preset: "trueforge",
           mode: "dark",
