@@ -1,329 +1,269 @@
-# MANDATE — an agent with a license to act, and a limit on it
+<div align="center">
+  <img src="mandate/app/public/agent-mark.svg" width="72" alt="MANDATE logo" />
 
-An agent that can place a trade is easy. An agent you would leave running while you sleep is not.
-MANDATE is a paper-trading agent whose authority is written down by a human, versioned, and enforced
-by deterministic code the model cannot argue with. The model proposes. **The guard decides.** Anything
-irreversible stops and waits for a person.
+# MANDATE
 
-Built for [The Agent Harness Hackathon](https://www.wemakedevs.org/hackathons/trueforge),
-WeMakeDevs × TrueFoundry, 24–30 August 2026, on **[TrueForge](https://github.com/truefoundry/trueforge)**.
+### An autonomous paper-trading agent with authority you can prove
 
-> **Paper trading only.** No live-money order is ever placed. Not investment advice. Backtests and
-> paper results do not predict future returns.
+**The model proposes. Deterministic code constrains. A human authorizes.**
 
-The question this interface answers is narrow and human: **who has the right to press the button right
-now, when you are not at the desk?**
+[![TrueForge](https://img.shields.io/badge/TrueForge-agent_harness-E5B928?style=for-the-badge)](https://www.truefoundry.com/trueforge)
+[![Alpaca](https://img.shields.io/badge/Alpaca-paper_trading-111318?style=for-the-badge&logo=alpaca&logoColor=white)](https://alpaca.markets/)
+[![Python](https://img.shields.io/badge/Python-3.11+-111318?style=for-the-badge&logo=python&logoColor=E5B928)](https://www.python.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-111318?style=for-the-badge&logo=typescript&logoColor=E5B928)](https://www.typescriptlang.org/)
+[![MCP](https://img.shields.io/badge/MCP-least_privilege-111318?style=for-the-badge)](https://modelcontextprotocol.io/)
 
----
+[**Open live demo →**](https://harn.miposts.com) · [Architecture](#architecture) · [Run locally](#run-locally) · [Safety evidence](#verified-safety-evidence)
 
-## Judge it in ten minutes
+</div>
 
-Steps 1–3 need **no broker account, no API key, no credentials** — a local mock serves the same contract
-the real guard does.
+> [!NOTE]
+> **Public test profile** — URL: **[harn.miposts.com](https://harn.miposts.com)** · Login: `demo` · Password: `MandateDemo2026`
+>
+> This shared profile is an isolated, interactive safety rehearsal. It exposes no production account values, internal service URLs, secrets, or trajectory controls. It can respond only to the bounded rehearsal approvals shown in the UI.
 
-```bash
-git clone https://github.com/GoatWhistle/harness-hack.git
-cd harness-hack/mandate/app && npm install
-npm run mock &     # dashboard API on 127.0.0.1:8030
-npm run dev        # console on 127.0.0.1:8031
+![MANDATE operator approval dashboard](docs/assets/mandate-approval-dashboard.png)
+
+## Why MANDATE exists
+
+Giving an LLM a broker API creates an authority problem, not merely a prediction problem. A persuasive model response is not proof that an order respects position limits, current exposure, market hours, loss budgets, or the operator's intent.
+
+MANDATE separates intelligence from authority:
+
+| The usual agent risk | MANDATE's answer |
+|---|---|
+| The model can reach a raw trading endpoint | The model receives no raw order-placement tool |
+| Natural-language rules are interpreted loosely | A strict, versioned YAML mandate is executable policy |
+| Approval can accidentally override risk controls | Approval resumes execution but never bypasses the guard |
+| Stale data produces confident actions | Freshness, spread, volume, session and benchmark gates fail closed |
+| Retries can duplicate an order | Stable intent IDs and broker provenance make retries idempotent |
+| A dashboard can display stale broker state as live | Degraded mode withholds unverifiable values visibly |
+
+The result is a 24/7 research agent that can monitor markets, explain opportunities, ask for approval, and submit **paper orders only when deterministic code proves they are inside the mandate**.
+
+## Product experience
+
+### One decision at a time
+
+The operator sees a compact decision card, ready position size, order terms, rationale, and the exact safety checks that passed. Approve or deny; the completed card moves into the journal instead of taking over the screen.
+
+### A live, legible portfolio
+
+Equity, P&L, exposure, positions, orders, news, agent decisions and mandate headroom update on one full-width dashboard. News has a focused latest-story view and a separate feed; monitoring controls live in an IDE-style settings drawer.
+
+![MANDATE dynamic paper portfolio and audit journal](docs/assets/mandate-live-portfolio.png)
+
+### Chat as the control plane
+
+The agent keeps working outside chat. Chat remains available to explain a decision, inspect evidence, adjust the thesis, narrow the symbol pool, or propose a cadence/risk-posture change. Persistent trajectory changes require explicit confirmation and cannot expand the hard mandate universe.
+
+## Architecture
+
+```mermaid
+flowchart LR
+    M[Market data<br/>Alpaca IEX / SIP] --> R[Research MCP<br/>read only]
+    N[News + filings<br/>fixed-host sources] --> R
+    R --> T[TrueForge agent<br/>Z.AI + subagents]
+    T -->|PARK| J[(Durable audit journal)]
+    T -->|PROPOSE| H{Human approval}
+    H -->|deny| J
+    H -->|approve| G[Mandate Guard<br/>deterministic MCP]
+    Y[Versioned mandate.yaml] --> G
+    G -->|deny| J
+    G -->|fresh re-check| A[Alpaca Paper API]
+    A --> J
+
+    classDef gold fill:#19150b,stroke:#e5b928,color:#fff;
+    classDef dark fill:#111318,stroke:#5f6368,color:#fff;
+    class T,H,G gold;
+    class M,N,R,Y,A,J dark;
 ```
 
-| # | Do this | It proves |
-|---|---|---|
-| 1 | Open `http://127.0.0.1:8031`. Read the top card for ten seconds | A stranger can tell what is waiting, what it costs, and what each button does — without a tour |
-| 2 | Look at **Authority remaining under the mandate** on that card | The console shows *the rule*, not a verdict: used / limit / headroom per rule, and states that approval cannot override a mandate rule |
-| 3 | `curl "http://127.0.0.1:8030/api/mock/degraded?on=true"` and reload | Every broker figure becomes `— WITHHELD`, the reason is named, and approval is **structurally removed**. It will not let you authorize against limits nobody can check. Restore with `on=false` |
-| 4 | Tab to **Approve** and press Enter | The whole decision path is keyboard-complete, with a visible focus ring |
-| 5 | `cd ../mcp-guard && python -m pytest` | 91 guard tests, including fail-closed malformed mandates, concurrent submissions and retry idempotency |
-| 6 | `cd ../agent && npm run eval:approval` | A live probe: the harness pauses an irreversible tool, takes a denial, and the guard journal stays byte-for-byte unchanged |
+There are three deliberately unequal trust zones:
 
----
+1. **Research plane — unprivileged.** Parses bounded market/news inputs, calculates features and produces evidence. It has no trading client.
+2. **Agent plane — creative but untrusted.** TrueForge and the model can research, challenge a thesis and propose an action. Tool allowlists prevent direct execution.
+3. **Execution plane — deterministic.** The guard owns paper broker credentials, reloads the human mandate, fetches fresh state, applies every limit with `Decimal`, and journals the result.
 
-## The idea
+## What the agent understands
 
-A trading agent is the honest worst case for agent autonomy: the actions are irreversible, the damage is
-denominated in money, and the model is confidently wrong at exactly the wrong moments. Three things follow.
+The production funnel monitors 18 liquid AI/platform/infrastructure equities plus SPY:
 
-**Authority is a document, not a prompt.** The mandate is human-authored YAML — universe, order types,
-session, hard limits, and pre-decided rules like `daily_loss_pct >= 1 → park_new_orders`. It is versioned
-and hot-reloadable, and the agent has no tool that can write it. Every decision records a SHA-256
-fingerprint of the exact mandate that authorized it, so an auditor can tell decisions made before a rule
-change from decisions made after.
+`AAPL` `MSFT` `NVDA` `GOOGL` `AMZN` `META` `AMD` `AVGO` `ORCL` `IBM` `PLTR` `CRM` `ANET` `TSM` `ASML` `ARM` `BABA` `BIDU` `SPY`
 
-**The model never holds the trigger.** The agent is not given an order-placement tool at all. Its only
-execution path is `mandate-guard`, which re-fetches broker state and re-checks every limit with `Decimal`
-arithmetic immediately before submission. A human approval does not bypass a mandate rule — it only
-authorizes an action the guard already found legal.
+It turns price, liquidity, market regime and attributable news into eight explainable strategy outputs:
 
-**The stop is the product.** The most important moment in this system is the one where the agent *doesn't*
-act. So the interface is built around that moment rather than around a P&L chart.
+- price momentum and volatility-adjusted momentum;
+- rolling z-score and RSI mean reversion;
+- volume-confirmed breakout;
+- MACD trend;
+- structured LLM news impact confirmed by price;
+- regime-weighted ensemble.
 
----
+News is scored as structured data — `sentiment`, `confidence`, `event_type`, `horizon`, `novelty_vs_48h`, affected tickers and reason — rather than by a tiny positive/negative word list. The LLM enriches evidence; deterministic code still owns the decision boundary.
 
-## The operator console
+ATR14 sizing converts risk budget and signal strength into a whole-share quantity, capped by mandate headroom and same-side correlation clusters. SPY trend/range state changes ensemble weights and scales gross risk. Completed 5/15/60-minute outcomes update bounded strategy multipliers, including counterfactual outcomes for parked ideas: adaptive behavior without letting a model rewrite policy.
 
-The judging brief for the UI track asks for an interface a stranger can pick up and drive. That framing
-decided the whole design.
+## Safety invariants
 
-![The decision card: BUY 13 NVDA · LIMIT $183.40, with order terms, the mandate authority table showing used/limit/headroom per rule, and distinct Approve and Deny controls](docs/screens/decision.png)
+| Invariant | Enforcement |
+|---|---|
+| **Paper only** | Exact host allowlist accepts `https://paper-api.alpaca.markets`; live, HTTP, credential-bearing and look-alike URLs are rejected |
+| **No hidden authority** | The agent cannot write the mandate and cannot access a direct broker execution tool |
+| **Fresh-state validation** | Account, broker clock, latest trade, pending orders and every limit are re-read immediately before submit |
+| **Fail closed** | Missing/malformed policy, transport errors, stale data, closed sessions and unknown rules deny execution |
+| **Approval is not an override** | Human approval resumes the tool call; the guard repeats policy checks independently |
+| **Bounded risk** | Position, gross exposure, daily loss, order count, session, universe, instrument and order type are deterministic |
+| **Safe retries** | Canonical intent fingerprints, stable client IDs and durable provenance prevent duplicate or mutated retries |
+| **Auditable changes** | Every prepared, denied and submitted event carries the SHA-256 fingerprint of the validated mandate |
+| **Protected exits** | Cancellation requires submitted provenance; closes are risk-reducing and explicitly opt-in |
+| **Untrusted news** | Input is size-bounded, normalized, timestamped and treated only as data—not as instructions |
 
-**Gold means one thing: a human is required.** It is spent on the pending decision and on nothing else —
-no gold links, headings, chart colours, or hover states. Its scarcity is what makes a waiting decision
-impossible to miss on a dense screen.
+The guard supports human-authored predecisions such as `daily_loss_pct >= 1 → park_new_orders`. Unknown metrics or actions make the mandate invalid instead of being guessed.
 
-**The card shows the rule, not the verdict.** Used, limit and headroom for every mandate rule that governs
-this order, closing with the line *"Approval cannot override a mandate rule."* The operator can see the
-authority they are exercising, not just a green button.
+## TrueForge: the agent harness
 
-**Approve and Deny are not two coloured buttons.** Each carries a marker glyph, a label, and a consequence
-line that changes with the tool — *"Submits the paper order"* / *"Agent replans"* for an order,
-*"Lets the agent proceed"* / *"Agent stands down"* for anything else. Nothing depends on colour alone.
+TrueForge provides the durable agent runtime around the safety kernel:
 
-**Degradation is loud.** When the guard cannot be reached, broker-derived values render as a labelled dash
-rather than their last known figure, the failing services and the actual error are named, and the approval
-controls are replaced — not merely disabled — by a line explaining that an order cannot be authorized
-against limits nobody can currently check. The queued decision stays visible so a returning operator does
-not mistake an outage for an empty queue.
+- persistent sessions, tool-call traces and context compaction;
+- MCP tool isolation and explicit execution allowlists;
+- approval pauses for irreversible actions;
+- dynamic read-only subagents for price research, news research and risk challenge;
+- sandbox access for bounded experiments, watched by a persisted-event policy auditor;
+- one operator workspace for autonomous runs and conversational control.
 
-![Degraded mode: every metric reads WITHHELD, the offline services and the ConnectionRefusedError are named, and the pending decision shows that it cannot be authorized while the guard is unreachable](docs/screens/degraded.png)
+The background runner consumes Alpaca news and market WebSockets with a configurable REST fallback. Every cycle must end in `ACTION: PARK` or `ACTION: PROPOSE`; a mechanical post-model gate parks any proposal that violates session, liquidity, staleness, relative-volume, macro or mandate constraints.
 
-**Motion tracks state, and nothing else.** Tab changes crossfade through the View Transitions API with the
-underline sliding to the new tab; a decision card rises in when it arrives; the approval mark draws itself
-in stroke by stroke, then the card settles to 62% and *stays on screen* — decisions are not swept away.
-One thing loops, deliberately: a slow 8-second glow on the approval region, because it is the only element
-whose job is to call a person. It stops when nothing is pending and when the tab is hidden.
+## Example mandate
 
-Numbers deliberately **do not** animate. A tweened equity figure displays a dozen values that were never
-true, which is exactly the false confidence this product exists to refuse.
+Human authority is small enough to read and strict enough to execute:
 
-**Accessibility is part of the argument.** Every state pairs hue with a shape and a label; contrast passes
-AA everywhere with zero failures; the decision path is keyboard-complete with a visible focus ring; the
-settings drawer traps focus and restores it; `prefers-reduced-motion` removes every transform and loop
-while keeping the approval glow as a static signal, because there the movement is decoration but the
-signal is information.
+```yaml
+universe: [AAPL, MSFT, NVDA, GOOGL, AMZN, META, AMD, AVGO, SPY]
+instruments: [equity]
+order_types: [limit]
+session: regular_hours_only
+limits:
+  max_position_pct: 10
+  max_gross_exposure_pct: 60
+  max_daily_loss_pct: 2
+  max_orders_per_day: 20
+predecided:
+  - when: daily_loss_pct >= 1
+    then: park_new_orders
+    reason: Protect the remaining daily loss budget before the hard stop.
+allow_short_positions: false
+allow_risk_reducing_market_close: true
+expires: 2099-08-28T20:00:00Z
+```
 
-The browser tab carries the state too: the title reads `(2) Dashboard — MANDATE` when decisions are
-waiting, and the favicon's disc turns gold for a pending decision and red when the guard is down — so an
-operator can see the console needs them from a background tab.
+See the complete [example mandate](mandate/mandates/example.yaml).
 
----
+## Run locally
 
-## How it uses TrueForge
+### Prerequisites
 
-TrueForge is the harness, not a wrapper around a model call:
+- Python 3.11+
+- Node.js 22 or 24
+- Alpaca **paper** account
+- Z.AI API key for structured news scoring
 
-- **Approval gate.** `requireApprovalForTools` pauses `submit_order_under_mandate`, `cancel_order`,
-  `close_position` and `update_trajectory` at the harness level. The console renders those real pending
-  tool calls and posts decisions back through TrueForge's approval API.
-- **Explicit tool allowlists, not annotation tags.** TrueForge derives its default approval set from MCP
-  annotations, and Alpaca's MCP annotates only a fraction of its generated tools — so a broad `@write` tag
-  would leave the untagged tail ungated. `alpacaTools.ts` therefore names every research tool it allows
-  and every write tool it denies, by hand.
-- **Sandbox execution** for read-only data validation, with a persisted-event watchdog that cancels any
-  background turn attempting `exec` on an execution path.
-- **Subagents** for isolated research threads, proven by `eval:subagents` requiring exactly two
-  delegations in distinct threads with no approval and no execution tool.
-- **Its own chat, unimitated.** The Agent chat tab is TrueForge's assistant UI, re-themed through the
-  library's 38-key `SemanticTokens` contract so it shares our palette without us forking its markup.
-- **Three MCP servers:** `mandate-guard` (execution authority), `mandate-research` (read-only decision
-  tools), and the official Alpaca MCP restricted to calendar, clock and market-data tools.
+Copy the environment template and add local secrets. Never commit `.env`:
 
-The agent also runs **24/7 outside chat**: the autonomy runner subscribes to Alpaca news and market
-WebSockets, deduplicates through a durable cursor, and starts a read-only analysis on new headlines or on
-cadence. Every cycle ends in `ACTION: PARK` or `ACTION: PROPOSE` and is mechanically audited afterwards.
+```bash
+cp mandate/.env.example mandate/.env
+```
 
----
+Install and test the deterministic services:
 
-## Safety boundary
+```bash
+cd mandate/mcp-guard
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -e '.[test]'
+python -m pytest
 
-The agent never receives a raw order-placement tool. Its only execution path is `mandate-guard`:
+cd ../../mandate/research
+python -m pip install -e '.[test]'
+python -m pytest
+```
 
-1. Load and strictly validate the current mandate.
-2. Fetch a fresh paper-account snapshot and the latest IEX trade.
-3. Calculate projected position and gross exposure with `Decimal` arithmetic.
-4. Reject every violated rule; violations cannot be overridden by the model or an approval click.
-5. Fetch state and run the checks **again** immediately before submission.
-6. Submit only to the exact host `https://paper-api.alpaca.markets` and append an audit event.
-
-Stable intent IDs make submission retries idempotent, and cancellation is allowed only when the order's
-client ID is backed by a submitted event in the persistent guard journal. Retries recover their original
-broker client ID from durable provenance, so renaming a mandate cannot turn one intent into a second
-order; conflicting stored IDs fail closed.
-
-Human predecisions are executable YAML, not model guidance. The grammar deliberately supports only metrics
-the guard can observe itself and one fail-closed action; unknown metrics or actions prevent the mandate
-from loading. A missing, malformed or partially written file fails closed before broker state is fetched.
-
-The server refuses live, HTTP, look-alike, credential-bearing, port-bearing and path-bearing base URLs.
-Secrets are read from environment variables and must never be committed. Short selling is a separate,
-explicit capability and defaults to disabled; the guard counts already-pending sell orders so individually
-valid orders cannot collectively cross a long position through zero.
-
-Untrusted text stays untrusted: news is normalized as data before it reaches any strategy, input size is
-capped, markup removed, timestamps required to be timezone-aware. Text such as *"ignore previous
-instructions"* remains inert data and is never used as an agent instruction. An issuer feed is never
-rebound to another ticker.
-
----
-
-## Run it
-
-### The console, without a broker
+Build the dashboard and validate the agent:
 
 ```bash
 cd mandate/app
 npm install
-npm run mock      # mock dashboard API on 127.0.0.1:8030
-npm run dev       # Vite dev server on 127.0.0.1:8031
+npm run typecheck
+npm run build
+
+cd ../agent
+npm install
+npm run typecheck
+npm run eval:autonomy
 ```
 
-The mock serves the same `/api/snapshot` contract as the real companion API, with pending approvals, a
-multi-day decision journal, positions, news and the strategy scorecard. It also reproduces the degraded
-path on demand, which is otherwise hard to observe:
+Start the guard, research MCP, dashboard, TrueForge and autonomy runner as separate supervised processes:
 
 ```bash
-curl "http://127.0.0.1:8030/api/mock/degraded?on=true"    # guard unreachable
-curl "http://127.0.0.1:8030/api/mock/degraded?on=false"   # back to live
-```
-
-### The full system
-
-Python 3.11+ and Node 22 or 24.
-
-```bash
-# Guard tests
-cd mandate/mcp-guard
-python -m venv .venv && source .venv/bin/activate
-python -m pip install -e '.[test]'
-python -m pytest
-
-# Guard, with paper credentials exported from an ignored .env
-cd mandate && python -m pip install -e mcp-guard && mandate-guard
-
-# Read-only research MCP
-cd mandate/research && python -m pip install -e .
+mandate-guard
 MANDATE_RESEARCH_TRANSPORT=streamable-http mandate-research-mcp
+mandate-dashboard
 
-# Console build + companion API
-cd mandate/app && npm install && npm run build
-cd ../mcp-guard && mandate-dashboard
-
-# TrueForge, serving the built console
-PORT=8790 FRONTEND_DIR=/absolute/path/to/mandate/app/dist npx @truefoundry/trueforge@0.1.4
-
-# The agent, and 24/7 autonomy
-cd mandate/agent && npm install && npm run apply
+cd mandate/agent
+npm run apply
 npm run autonomy
 ```
 
-Open only `http://localhost:8790`. Port `8030` is a local read-only companion API consumed by the console,
-not a second UI. Broker credentials never reach the browser: live state is read through the guard's
-read-only MCP tools.
+The default local ports are guard `8010`, research `8020`, dashboard API `8030`, and TrueForge/UI `8790`. Deployment should keep MCP and dashboard services on loopback and expose only the authenticated HTTPS operator UI.
 
-The example mandate is [`mandate/mandates/example.yaml`](mandate/mandates/example.yaml). An expired or
-invalid mandate prevents startup.
+## Verified safety evidence
 
----
+The repository contains executable probes, not just architecture claims:
 
-## Verification
-
-These runs happened against the real TrueForge harness, the real Alpaca paper API and live news sources.
-The sanitized artifact is [`docs/evidence/paper-e2e-2026-08-27.json`](docs/evidence/paper-e2e-2026-08-27.json);
-the full log is [`docs/MANDATE_VERIFICATION.md`](docs/MANDATE_VERIFICATION.md).
-
-| What was proven | How |
+| Probe | What it proves |
 |---|---|
-| The irreversible tool stops for a human | A live probe requested `cancel_order`; the harness emitted `tool.approval_required`, took a denial, and the guard journal stayed byte-for-byte unchanged |
-| Approval does not bypass the mandate | The agent asked the guard to evaluate TSLA; it was denied for two independent reasons — outside the universe, and the exchange was closed |
-| Retries cannot double-submit | An approved `AAPL buy 1, limit $1` produced durable `prepared → submitted`; an unchanged retry paused for a second approval and produced only `deduplicated`, same client-order ID |
-| Cancellation is bounded by provenance | An exact-ID cleanup paused at `cancel_order`, was approved, and official Alpaca readback showed the order `canceled` |
-| Authority survives a restart | A parked action was recovered — rationale and intended action intact — from the fsynced JSONL journal by a fresh guard process and a new TrueForge session |
-| The model never got a write tool | The agent's Alpaca tool discovery contained no order-placement tool |
+| `npm run eval:sandbox` | Deterministic Code Mode works without touching MCP or approval |
+| `npm run eval:subagents` | Two isolated read-only subagents delegate without execution authority |
+| `npm run eval:approval` | An irreversible tool pauses; denial leaves the guard journal byte-identical |
+| `npm run eval:research-e2e` | TrueForge + Z.AI use bounded research tools and produce no broker write |
+| `MANDATE_E2E_ALLOW=true npm run eval:paper-e2e` | Supervised paper submit, durable provenance and idempotent retry |
+| `npm run eval:cancel-e2e` | Exact-ID cancellation requires submitted guard provenance |
 
-Local suite: **91 guard tests**, **70 research/Skill/MCP tests**, **13 autonomy-runner tests**, covering
-hot-reloaded authority, fail-closed malformed edits, concurrent submissions, pending-order risk
-reservations, broker-clock fail-closed behaviour, stable retry IDs, journal restoration and rejection of
-foreign order cancellation.
+The sanitized [paper E2E artifact](docs/evidence/paper-e2e-2026-08-27.json) records a real Alpaca paper flow: `prepared → submitted`, official broker readback, an unchanged retry producing `deduplicated`, and an approval-gated cancellation. The [verification report](docs/MANDATE_VERIFICATION.md) documents the wider integration evidence.
 
-Strategy figures in the log are engineering observations over one sample, **not forecasts**.
+> [!IMPORTANT]
+> Backtests use point-in-time inputs, configurable fees, spread-crossing slippage and a frozen-parameter holdout. Their output is engineering evidence—not a profitability claim or forecast.
 
----
+## Qodo review discipline
 
-## Layout
+Qodo Code Review was installed before the first product code. Milestones M1–M12 were reviewed through PRs [#1](https://github.com/GoatWhistle/harness-hack/pull/1) and [#2](https://github.com/GoatWhistle/harness-hack/pull/2). Findings included pending-exposure undercounting, concurrent submissions, mandate bypass on close, retry provenance and point-in-time news errors; each was fixed with a regression test. Recorded repeat reviews report **0 bugs and 0 rule violations** for the reviewed milestone commits.
+
+The full, commit-linked history and project-specific review rules are in the [Qodo review log](docs/QODO_REVIEW_LOG.md). New commits are not represented as Qodo-reviewed until their review is added to that log.
+
+## Repository map
 
 ```text
 mandate/
-  mcp-guard/     execution authority — the only path to the broker
-  research/      read-only decision tools, exposed as MCP and an opt-in Git Skill
-  agent/         TrueForge agent spec, tool allowlists, autonomy runner, eval runners
-  app/           the operator console — React 19, Vite, no UI framework
-    src/app/         shell: top bar, tabs, snapshot polling, browser identity
-    src/views/       dashboard/ news/ diagnostics/ agent/
-    src/styles/      tokens, then base, layout, chrome/, components/, journal/, views/
-    mock/server.mjs  the whole console runs against this with no broker
-  mandates/      the human-authored YAML that grants authority
-docs/            verification log and the sanitized E2E artifact
+├── agent/          # TrueForge spec, 24/7 runner and executable E2E probes
+├── app/            # React operator dashboard and agent workspace
+├── mandates/       # Human-owned, versioned authority
+├── mcp-guard/      # Deterministic execution boundary and audit journal
+└── research/       # Read-only signals, news, monitoring, sizing and backtests
+docs/
+├── assets/         # Product screenshots
+├── evidence/       # Sanitized machine-readable E2E artifacts
+├── MANDATE_VERIFICATION.md
+└── QODO_REVIEW_LOG.md
 ```
 
-Every file in the console is ≤250 lines and no folder holds more than seven, so a reviewer can open any
-one of them and hold it in their head. Stylesheets are split by meaning rather than by page.
+## Scope and disclaimer
 
----
+MANDATE is a safety-focused hackathon project for **paper trading only**. It does not place live-money orders, provide investment advice, promise profit, or imply that backtest/paper performance will transfer to live markets. Production use would require independent security review, regulatory analysis, operational controls and extensive validation beyond this repository.
 
-## Honest limitations
+<div align="center">
 
-Stated here rather than left for a judge to find:
+**Built to make agent authority visible, bounded and auditable.**
 
-- **The console's live data path needs the guard.** Steps 1–4 of the judge path run entirely on the mock;
-  the real broker figures need paper credentials and a running guard.
-- **`eval:paper-e2e` needs an open market** to prove the full submit path. Outside regular hours it proves
-  the session breach instead and reports `deferred: market_closed` — honest, but not the same test.
-- **Strategy results are one sample.** A 24-hour news window on one symbol over a few hundred bars is an
-  engineering comparison, not evidence of profitability. The forward-outcome scorecard exists to make that
-  distinction visible rather than to claim an edge.
-- **SEC EDGAR returned HTTP 403** from our environment during live probing. It is reported as an upstream
-  failure rather than quietly dropped.
-- **Auto-paper mode exists** behind an explicit toggle and a confirmation. It still passes every mandate
-  check and still requires approval for cancel, close and trajectory changes — but it is the one mode where
-  a submission does not wait for a person, and it is off by default.
+[Try the safety rehearsal](https://harn.miposts.com) · [Read the verification report](docs/MANDATE_VERIFICATION.md) · [Inspect the Qodo log](docs/QODO_REVIEW_LOG.md)
 
----
-
-## AI assistance, disclosed
-
-I used **Claude Code (Anthropic)** throughout, as rule 12 requires me to say.
-
-It helped most with implementation and review: drafting modules, writing large parts of the test suites,
-and — used as a set of adversarial reviewers — auditing the console for UX, accessibility, technical
-defects, motion and visual craft. Those audits found real defects I had shipped: an approval control whose
-buttons rendered as indistinguishable transparent text because a library's Tailwind tokens never resolved,
-a formatter that displayed `$0.00` under a `LIVE` badge when a value was missing, and a decorative gold
-hairline I had added that quietly devalued the one colour the whole product depends on.
-
-The decisions that make the project worth anything are mine: that authority belongs in a versioned
-document rather than a prompt, that the guard re-checks after approval rather than trusting it, that a
-denial should quote the breached limit instead of asserting a verdict, that parked decisions are the
-session's most valuable artifact, that degradation must be loud, and that numbers must never animate.
-
----
-
-## Qodo Code Review Evidence
-
-Qodo Code Review was installed on this repository before product code was added. Every milestone is
-developed on a branch, reviewed in a pull request, and merged by a human. High-severity findings are fixed
-or dismissed in the Qodo thread with a written reason; Medium and Low are an engineering call.
-
-<!-- SUBMISSION: replace the three placeholders below before submitting. -->
-
-**Representative merged pull request:** *PR link*
-
-**What Qodo surfaced, and what changed:** *One or two sentences: the finding, and the fix or the reason for dismissing it.*
-
-**Review history:** *Link to the PR conversation showing the completed review, the decisions taken, and the follow-up review against the final code.*
-
-Every pull request is also checked for passing tests, paper-only endpoints and the absence of secrets
-before it is merged.
-
----
-
-MIT licensed.
+</div>
